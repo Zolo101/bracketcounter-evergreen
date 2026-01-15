@@ -1,0 +1,58 @@
+{
+	"config": {
+		"accessCode": "default",
+		"authCache": "./authdata.json",
+		"blacklist": [],
+		"contestants": {
+			"a": ["Beach Ball", "#f05657"],
+			"b": ["David", "#d6ebec"],
+			"c": ["Fern", "#2aba55"],
+			"d": ["Jammy", "#f9a63c"],
+			"e": ["Needy", "#dd70d4"],
+			"f": ["Rose", "#d62d3f"],
+			"g": ["Ruler", "#ebd9a2"],
+			"h": ["Sidewalky", "#c8c5b8"],
+			"i": ["Sticker", "#f5596b"],
+			"j": ["Toothpaste", "#46d0ed"],
+			"k": ["Hot Dog", "#a25a52"],
+			"l": ["Money", "#8bbf98"]
+		},
+		"deadlineHours": 168,
+		"id": "bnzOL9v5Pn0",
+		"liveMode": true,
+		"longRefreshTime": 86400,
+		"maxMultiVoters": 1,
+		"port": 3001,
+		"re": {},
+		"refreshTime": 60,
+		"savestateFile": "./savestate.json",
+		"secret": "todo-maybe-figure-out-a-better-way-y7rDJQgcpr98p3Cue1GlKxCDO40wnhrC",
+		"suspended": false
+	},
+	"status": {
+		"comments": 40219,
+		"deadline": 1768500044000,
+		"done": true,
+		"id": "bnzOL9v5Pn0",
+		"multiVoters": 5089,
+		"runningPostTask": true,
+		"totalComments": "9717",
+		"updateDate": 1767912862930,
+		"validVotes": 35255
+	},
+	"total": 35255,
+	"votes": {
+		"a": 3101,
+		"b": 6797,
+		"c": 5512,
+		"d": 2464,
+		"e": 3884,
+		"f": 3004,
+		"g": 992,
+		"h": 1516,
+		"i": 5076,
+		"j": 839,
+		"k": 658,
+		"l": 1412
+	}
+}

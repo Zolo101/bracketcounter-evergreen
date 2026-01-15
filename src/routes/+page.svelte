@@ -2,7 +2,7 @@
     import type { SocketMessageData } from "$lib/types";
     import Pocketbase from "pocketbase";
     import BCLOGO from "$lib/assets/bc_green.svg?component";
-    import BFDIE1Results from "$lib/assets/bfdie1.png";
+    import BFDIE1Results from "$lib/assets/results/bfdie1.png";
     import { formatRelativeTimeLong } from "$lib";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
@@ -32,8 +32,6 @@
             })
             .sort((a, b) => b.votes - a.votes)
     );
-
-    // let online = $state(client.realtime.isConnected);
 
     let navHeight = $state(0);
 
@@ -171,7 +169,7 @@
                             </span>
                         </div>
                         <div class="percentage ml-auto flex h-10 items-center max-lg:text-sm!">
-                            <img
+                            <enhanced:img
                                 src={image}
                                 alt=""
                                 class="relative h-10 scale-200 -rotate-15 self-end mask-r-from-40% mask-r-to-80% object-cover object-center"

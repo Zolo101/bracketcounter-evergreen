@@ -2,7 +2,6 @@
     import "./layout.css";
 
     import favicon from "$lib/assets/favicon.png";
-    import thanks from "$lib/assets/thanks1.png";
     let { children } = $props();
 </script>
 

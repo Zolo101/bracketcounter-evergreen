@@ -1,9 +1,9 @@
-import { command, getRequestEvent } from "$app/server";
+import { getRequestEvent } from "$app/server";
 import type { RequestEvent } from "../../routes/$types";
 import { env } from "$env/dynamic/private";
 
 async function logIn(fetch: RequestEvent["fetch"]) {
-    const authResponse = await fetch(env.UMAMI_API_CLIENT_ENDPOINT + "/api/auth/login", {
+    const authResponse = await fetch("https://analytics.zelo.dev/api/auth/login", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
@@ -23,7 +23,7 @@ export async function getOnlineUsers() {
         const { token } = await logIn(fetch);
 
         const realtimeResponse = await fetch(
-            env.UMAMI_API_CLIENT_ENDPOINT + "/api/realtime/" + env.UMAMI_API_WEBSITE_ID,
+            "https://analytics.zelo.dev/api/realtime/634d53b7-0a46-4caf-82a8-95db35ba1f6d",
             {
                 method: "GET",
                 headers: {

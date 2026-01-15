@@ -17,7 +17,7 @@
         width: 100%;
         height: 100%;
         z-index: -1;
-        background-color: #a7e0ed;
+        background-color: #a2deec;
         background-image: url("$lib/assets/thanks1.png");
         background-size: contain;
         background-attachment: fixed;

@@ -16,19 +16,11 @@
     );
 
     const { data }: { data: PageData } = $props();
-    const { visitors } = data;
-
-    console.log(Characters);
+    let { visitors, buffer } = $derived(data);
+    // $inspect(buffer);
 
     const client = new Pocketbase("https://cdn.zelo.dev");
     const bc = client.collection<SocketMessageData>("bracketcounter");
-
-    async function getData() {
-        return (await bc.getOne("c7qpatzs5iizr7n")).buffer;
-    }
-
-    let buffer = $state(await getData());
-    $inspect(buffer);
 
     // Derived state: sort contestants by vote count and calculate percentages
     let sortedContestants = $derived(
@@ -41,10 +33,6 @@
             .sort((a, b) => b.votes - a.votes)
     );
 
-    bc.subscribe("c7qpatzs5iizr7n", async (e) => {
-        ({ buffer } = e.record);
-    });
-
     // let online = $state(client.realtime.isConnected);
 
     let navHeight = $state(0);
@@ -54,15 +42,18 @@
         formatRelativeTimeLong(new Date(buffer.status.updateDate), currentDate)
     );
 
-    const usersOnline = $state(visitors);
-
     onMount(() => {
         const interval = setInterval(() => {
             currentDate = new Date();
         }, 1000);
 
+        const subscription = bc.subscribe("c7qpatzs5iizr7n", async (e) => {
+            ({ buffer } = e.record);
+        });
+
         return () => {
             clearInterval(interval);
+            subscription.then((s) => s());
         };
     });
 </script>
@@ -105,14 +96,14 @@
                 </div>
                 <div>
                     <p>
-                        Uses figgyc's <a href="https://github.com/figgyc/bracketcounter"
-                            >bracket counter</a
-                        > to count all votes in an episode.
-                    </p>
-                    <p>
                         This isn't official. Prior episode results (unconfirmed): <a
                             href={BFDIE1Results}>BFDIE1</a
                         >
+                    </p>
+                    <p>
+                        Based on <a href="https://bfb.figgyc.uk/static/gate.html"
+                            >figgyc's bracket counter</a
+                        >.
                     </p>
                 </div>
             </div>
@@ -138,7 +129,7 @@
                 class="relative right-4.75 mx-1 inline-block h-2 w-2 rounded-full bg-green-500"
             ></div>
             <span class="relative right-4.75"
-                >{usersOnline} {usersOnline === 1 ? "user" : "users"} watching</span
+                >{visitors} {visitors === 1 ? "user" : "users"} watching</span
             >
         </div>
     </section>
@@ -160,7 +151,9 @@
                 <!-- <p class="font-mono text-2xl font-bold text-black">
                     [{contestant.id.toUpperCase()}]
                 </p> -->
-                <div class="flex h-10 items-center gap-5 overflow-hidden rounded drop-shadow-xl">
+                <div
+                    class="bar-container flex h-15 items-center gap-5 overflow-hidden rounded drop-shadow-xl"
+                >
                     <div
                         class="bar flex h-full items-center rounded px-3 leading-4 drop-shadow-xs"
                         style="width: {width}%; background-color: {contestant.color};"
@@ -238,6 +231,12 @@
     svg {
         text {
             font: bold 5px sans-serif;
+        }
+    }
+
+    @media (height < 60rem /* 640px */) {
+        .bar-container {
+            height: calc(var(--spacing) * 10) /* 2.5rem = 40px */;
         }
     }
 

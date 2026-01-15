@@ -5,6 +5,7 @@
     import BFDIE1Results from "$lib/assets/bfdie1.png";
     import { formatRelativeTimeLong } from "$lib";
     import { onMount } from "svelte";
+    import type { PageData } from "./$types";
 
     export const Characters: Record<string, { default: string }> = import.meta.glob(
         "$lib/assets/characters/*.webp",
@@ -13,6 +14,9 @@
             query: "?url"
         }
     );
+
+    const { data }: { data: PageData } = $props();
+    const { visitors } = data;
 
     console.log(Characters);
 
@@ -41,12 +45,16 @@
         ({ buffer } = e.record);
     });
 
+    // let online = $state(client.realtime.isConnected);
+
     let navHeight = $state(0);
 
     let currentDate = $state(new Date());
     const lastUpdated = $derived(
         formatRelativeTimeLong(new Date(buffer.status.updateDate), currentDate)
     );
+
+    const usersOnline = $state(visitors);
 
     onMount(() => {
         const interval = setInterval(() => {
@@ -120,10 +128,18 @@
     <!-- <hr /> -->
     <section class="mb-5">
         <div class="text-2xl font-bold">
-            Total Votes: {buffer.total.toLocaleString()}
+            <p>Total Votes: {buffer.total.toLocaleString()}</p>
         </div>
         <div class="text-xs">
-            Updated {lastUpdated}
+            <span>Updated {lastUpdated}</span>
+            <!-- what a hack lmao -->
+            <div class="mx-1 inline-block h-2 w-2 animate-ping rounded-full bg-green-500"></div>
+            <div
+                class="relative right-4.75 mx-1 inline-block h-2 w-2 rounded-full bg-green-500"
+            ></div>
+            <span class="relative right-4.75"
+                >{usersOnline} {usersOnline === 1 ? "user" : "users"} watching</span
+            >
         </div>
     </section>
 </nav>

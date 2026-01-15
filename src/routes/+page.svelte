@@ -7,7 +7,7 @@
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
 
-    export const Characters: Record<string, { default: string }> = import.meta.glob(
+    const Characters: Record<string, { default: string }> = import.meta.glob(
         "$lib/assets/characters/*.webp",
         {
             eager: true, // assuming we're using all the images right away

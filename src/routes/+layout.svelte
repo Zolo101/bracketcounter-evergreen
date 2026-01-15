@@ -6,10 +6,18 @@
     let { children } = $props();
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /><title>bracketcounter</title></svelte:head>
+<svelte:head>
+    <link rel="icon" href={favicon} />
+    <title>bracketcounter</title>
+    <script
+        defer
+        src="https://analytics.zelo.dev/script.js"
+        data-website-id="634d53b7-0a46-4caf-82a8-95db35ba1f6d"
+    ></script>
+</svelte:head>
 <div class="container2 m-auto flex h-full flex-col">{@render children()}</div>
 <div class="background2"></div>
-<enhanced:img class="background" src={thanks} alt="Background image" />
+<enhanced:img class="background" src="$lib/assets/thanks1.png" alt="Background image" />
 
 <style>
     .background {

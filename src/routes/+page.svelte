@@ -242,15 +242,15 @@
                 <p>Total Votes: {buffer.total.toLocaleString()}</p>
             </div>
             <div class="text-xs">
-                <span>Updated {lastUpdated}</span>
+                <span class=""
+                    >{visitors} {visitors === 1 ? "user" : "users"} watching on bc.zelo.dev</span
+                >
                 <!-- what a hack lmao -->
                 <div class="mx-1 inline-block h-2 w-2 animate-ping rounded-full bg-green-500"></div>
                 <div
                     class="relative right-4.75 mx-1 inline-block h-2 w-2 rounded-full bg-green-500"
                 ></div>
-                <span class="relative right-4.75"
-                    >{visitors} {visitors === 1 ? "user" : "users"} watching</span
-                >
+                <span class="relative right-4.75">Updated {lastUpdated}</span>
             </div>
         </section>
     </div>

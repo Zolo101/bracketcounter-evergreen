@@ -16,7 +16,7 @@
 </svelte:head>
 <div class="container2 m-auto flex h-full flex-col">{@render children()}</div>
 <div class="background2"></div>
-<enhanced:img class="background" src="$lib/assets/thanks1.png" alt="Background image" />
+<enhanced:img class="background" src="$lib/assets/thanks1.png" alt="" />
 
 <style>
     .background {

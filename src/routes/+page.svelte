@@ -183,7 +183,7 @@
     </div>
 {/snippet}
 
-<nav class="flex flex-col text-black" bind:clientHeight={navHeight}>
+<nav class="flex flex-col gap-2 text-black" bind:clientHeight={navHeight}>
     <section class="flex items-center justify-between gap-2 text-center max-sm:flex-col">
         <div class="text-xs">
             <div
@@ -218,7 +218,7 @@
         </section>
     </section>
     <!-- <hr /> -->
-    <div class="mb-5 flex items-center gap-5">
+    <div class="mb-5 flex items-center gap-2 max-sm:flex-col-reverse">
         <section class="w-50">
             <div class="flex overflow-hidden rounded ring-2 ring-lime-500">
                 <button
@@ -413,7 +413,7 @@
 
         .percentage {
             position: absolute;
-            left: min(50vw, calc(100% + 10px));
+            left: min(calc(100vw - 150px), calc(100% + 10px));
 
             span {
                 width: 300px;

@@ -4,6 +4,7 @@
     import BCLOGO from "$lib/assets/bc_green.svg?component";
     import BFDIE1Results from "$lib/assets/results/bfdie1.png";
     import BFDIE2Results from "$lib/assets/results/bfdie2.png";
+    import BFDIE3Results from "$lib/assets/results/bfdie3.png";
     import { formatRelativeTimeLong } from "$lib";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
@@ -27,18 +28,18 @@
     const bc = client.collection<SocketMessageData>("bracketcounter");
 
     const totalContestantVotes = new Map([
-        ["David", 12987 + 12236],
-        ["Sticker", 5326 + 9645],
-        ["Needy", 11141 + 7106],
-        ["Fern", 19073 + 10030],
-        ["Jammy", 7555 + 4432],
-        ["Rose", 6801 + 5459],
-        ["Beach Ball", 14744 + 5615],
-        ["Toothpaste", 1427 + 1765],
-        ["Ruler", 3300 + 1747],
-        ["Money", 7171 + 2417],
-        ["Hot Dog", 4247 + 1207],
-        ["Sidewalky", 4630 + 2632]
+        ["David", 12987 + 12236 + 8762],
+        ["Sticker", 5326 + 9645 + 7053],
+        ["Needy", 11141 + 7106 + 6821],
+        ["Fern", 19073 + 10030 + 6767],
+        ["Jammy", 7555 + 4432 + 5191],
+        ["Rose", 6801 + 5459 + 3780],
+        ["Beach Ball", 14744 + 5615 + 3394],
+        ["Toothpaste", 1427 + 1765 + 1868],
+        ["Ruler", 3300 + 1747 + 1766],
+        ["Money", 7171 + 2417 + 1177],
+        ["Hot Dog", 4247 + 1207 + 960],
+        ["Sidewalky", 4630 + 2632 + 2521]
     ]);
 
     // const barTweens = new Map<string, { from: number; to: number }>();
@@ -199,7 +200,7 @@
                     <p>
                         This isn't official. Prior episode results (unconfirmed): <a
                             href={BFDIE1Results}>BFDIE1</a
-                        >, <a href={BFDIE2Results}>BFDIE2</a>
+                        >, <a href={BFDIE2Results}>BFDIE2</a>, <a href={BFDIE3Results}>BFDIE3</a>
                     </p>
                     <p>
                         Based on <a href="https://bfb.figgyc.uk/static/gate.html"
@@ -226,7 +227,7 @@
                     class:active={!allEpisodes}
                     onclick={() => (allEpisodes = false)}
                 >
-                    BFDIE 3
+                    BFDIE 4
                 </button>
                 <button
                     class="toggle-btn"

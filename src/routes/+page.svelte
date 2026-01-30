@@ -5,6 +5,7 @@
     import BFDIE1Results from "$lib/assets/results/bfdie1.png";
     import BFDIE2Results from "$lib/assets/results/bfdie2.png";
     import BFDIE3Results from "$lib/assets/results/bfdie3.png";
+    import BFDIE4Results from "$lib/assets/results/bfdie4.png";
     import { formatRelativeTimeLong } from "$lib";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
@@ -28,18 +29,18 @@
     const bc = client.collection<SocketMessageData>("bracketcounter");
 
     const totalContestantVotes = new Map([
-        ["David", 12987 + 12236 + 8762],
-        ["Sticker", 5326 + 9645 + 7053],
-        ["Needy", 11141 + 7106 + 6821],
-        ["Fern", 19073 + 10030 + 6767],
-        ["Jammy", 7555 + 4432 + 5191],
-        ["Rose", 6801 + 5459 + 3780],
-        ["Beach Ball", 14744 + 5615 + 3394],
-        ["Toothpaste", 1427 + 1765 + 1868],
-        ["Ruler", 3300 + 1747 + 1766],
-        ["Money", 7171 + 2417 + 1177],
-        ["Hot Dog", 4247 + 1207 + 960],
-        ["Sidewalky", 4630 + 2632 + 2521]
+        ["David", 12987 + 12236 + 8762 + 7966],
+        ["Sticker", 5326 + 9645 + 7053 + 6043],
+        ["Needy", 11141 + 7106 + 6821 + 6744],
+        ["Fern", 19073 + 10030 + 6767 + 7899],
+        ["Jammy", 7555 + 4432 + 5191 + 4439],
+        ["Rose", 6801 + 5459 + 3780 + 2751],
+        ["Beach Ball", 14744 + 5615 + 3394 + 1682],
+        ["Toothpaste", 1427 + 1765 + 1868 + 1055],
+        ["Ruler", 3300 + 1747 + 1766 + 1822],
+        ["Money", 7171 + 2417 + 1177 + 830],
+        ["Hot Dog", 4247 + 1207 + 960 + 796],
+        ["Sidewalky", 4630 + 2632 + 2521 + 3133]
     ]);
 
     // const barTweens = new Map<string, { from: number; to: number }>();
@@ -97,8 +98,16 @@
         }
     };
 
+    type Contestant = {
+        id: string;
+        name: string;
+        color: string;
+        votes: number;
+        percentage: number;
+    };
+
     // Derived state: sort contestants by vote count and calculate percentages
-    let sortedContestants = $derived(
+    let sortedContestants: Contestant[] = $derived(
         Object.entries(buffer.votes)
             .map(([id, votes]) => {
                 const [name, color] = buffer.config.contestants[id] || ["Unknown", "#cccccc"];
@@ -184,6 +193,58 @@
     </div>
 {/snippet}
 
+{#snippet bar(contestant: Contestant)}
+    {@const nameColor = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
+    {@const color = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
+    {@const image = Characters[`/src/lib/assets/characters/${contestant.name}.webp`].default}
+    {@const votes = barWidth[contestant.id].votes.current}
+    {@const width = barWidth[contestant.id].width.current}
+    <div class="w-full grow items-center gap-5">
+        <div
+            class="bar-container flex h-15 items-center gap-5 overflow-hidden rounded-md drop-shadow-xl"
+        >
+            <div
+                class="bar flex h-full items-center rounded-md px-3 leading-4 drop-shadow-xs"
+                style="width: {width}%; background-color: {contestant.color};"
+            >
+                <div
+                    class="title relative flex items-baseline gap-2 self-center brightness-175 contrast-125"
+                    style="color: {nameColor};"
+                >
+                    <span class="id absolute -left-2 font-mono text-xs font-bold sm:top-3">
+                        {contestant.id.toUpperCase()}
+                    </span>
+                    <span class="name mx-2 font-bold wrap-anywhere text-shadow-sm">
+                        {contestant.name}
+                    </span>
+                </div>
+                <div class="percentage ml-auto flex h-10 items-center max-lg:text-sm!">
+                    <enhanced:img
+                        src={image}
+                        alt=""
+                        class="relative h-10 scale-200 -rotate-15 self-end mask-r-from-40% mask-r-to-80% object-cover object-center"
+                    />
+                    {#if allEpisodes}
+                        <span
+                            class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
+                            style="color: {color};"
+                        >
+                            {votes.toFixed(0)}
+                        </span>
+                    {:else}
+                        <span
+                            class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
+                            style="color: {color};"
+                        >
+                            {votes.toFixed(0)} ({contestant.percentage.toFixed(1)}%)
+                        </span>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+{/snippet}
+
 <nav class="flex flex-col gap-2 text-black" bind:clientHeight={navHeight}>
     <section class="flex items-center justify-between gap-2 text-center max-sm:flex-col">
         <div class="text-xs">
@@ -200,7 +261,8 @@
                     <p>
                         This isn't official. Prior episode results (unconfirmed): <a
                             href={BFDIE1Results}>BFDIE1</a
-                        >, <a href={BFDIE2Results}>BFDIE2</a>, <a href={BFDIE3Results}>BFDIE3</a>
+                        >, <a href={BFDIE2Results}>BFDIE2</a>, <a href={BFDIE3Results}>BFDIE3</a>,
+                        <a href={BFDIE4Results}>BFDIE4</a>
                     </p>
                     <p>
                         Based on <a href="https://bfb.figgyc.uk/static/gate.html"
@@ -210,15 +272,10 @@
                 </div>
             </div>
         </div>
-        <!-- <h1 class="text-3xl font-bold text-white sm:text-4xl">Bracketcounter</h1>
-    <button>Bar Graph</button>
-    <button disabled>Pie Chart</button>
-    <button disabled>Timeline</button> -->
         <section class="justify-end text-xl font-bold max-sm:hidden">
             {@render info()}
         </section>
     </section>
-    <!-- <hr /> -->
     <div class="mb-5 flex items-center gap-2 max-sm:flex-col-reverse">
         <section class="w-50">
             <div class="flex overflow-hidden rounded ring-2 ring-lime-500">
@@ -227,7 +284,7 @@
                     class:active={!allEpisodes}
                     onclick={() => (allEpisodes = false)}
                 >
-                    BFDIE 4
+                    BFDIE 5
                 </button>
                 <button
                     class="toggle-btn"
@@ -259,69 +316,12 @@
 <main class="mb-10 w-full grow" style="max-height: calc(100vh - {navHeight}px - 150px);">
     <div class="flex h-full flex-col items-stretch gap-1">
         {#each sortedContestants as contestant (contestant.id)}
-            {@const nameColor =
-                // "color-mix(in oklch shorter hue, " + contestant.color + " 100%, white)"}
-                "color-mix(in oklab, " + contestant.color + " 100%, white)"}
-            {@const color = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
-            <!-- {@const nameColor = "color-mix(in oklab, " + contestant.color + " 70%, black)"} -->
-            {@const image =
-                Characters[`/src/lib/assets/characters/${contestant.name}.webp`].default}
-            {@const votes = barWidth[contestant.id].votes.current}
-            {@const width = barWidth[contestant.id].width.current}
-            <!-- <div class="grid w-full grow grid-cols-[auto_1fr] items-center gap-5"> -->
-            <div class="w-full grow items-center gap-5" animate:flip={{ easing: cubicOut }}>
-                <!-- <p class="font-mono text-2xl font-bold text-black">
-                    [{contestant.id.toUpperCase()}]
-                </p> -->
-                <div
-                    class="bar-container flex h-15 items-center gap-5 overflow-hidden rounded-md drop-shadow-xl"
-                >
-                    <div
-                        class="bar flex h-full items-center rounded-md px-3 leading-4 drop-shadow-xs"
-                        style="width: {width}%; background-color: {contestant.color};"
-                    >
-                        <div
-                            class="title relative flex items-baseline gap-2 self-center brightness-175 contrast-125"
-                            style="color: {nameColor};"
-                        >
-                            <span class="id absolute -left-2 font-mono text-xs font-bold sm:top-3">
-                                {contestant.id.toUpperCase()}
-                            </span>
-                            <!-- class="name mx-2 inline-block bg-linear-to-t from-black/50 to-transparent bg-clip-text font-bold wrap-anywhere text-transparent" -->
-                            <span class="name mx-2 font-bold wrap-anywhere text-shadow-sm">
-                                {contestant.name}
-                            </span>
-                        </div>
-                        <div class="percentage ml-auto flex h-10 items-center max-lg:text-sm!">
-                            <enhanced:img
-                                src={image}
-                                alt=""
-                                class="relative h-10 scale-200 -rotate-15 self-end mask-r-from-40% mask-r-to-80% object-cover object-center"
-                            />
-                            {#if allEpisodes}
-                                <span
-                                    class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
-                                    style="color: {color};"
-                                >
-                                    {votes.toFixed(0)}
-                                </span>
-                            {:else}
-                                <span
-                                    class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
-                                    style="color: {color};"
-                                >
-                                    {votes.toFixed(0)} ({contestant.percentage.toFixed(1)}%)
-                                </span>
-                            {/if}
-                        </div>
-                    </div>
-                </div>
+            <div animate:flip={{ easing: cubicOut }}>
+                {@render bar(contestant)}
             </div>
         {/each}
     </div>
 </main>
-
-<!-- <footer class="py-6 text-center text-gray-400"></footer> -->
 
 <style>
     button {
@@ -362,11 +362,6 @@
         }
     }
 
-    hr {
-        border-color: var(--color-green-500);
-        margin: 1rem 0;
-    }
-
     /* .bar-container,
     .bar {
         corner-shape: squircle;
@@ -383,12 +378,6 @@
     .percentage {
         font-size: 2rem;
         line-height: 1;
-    }
-
-    svg {
-        text {
-            font: bold 5px sans-serif;
-        }
     }
 
     @media (height < 60rem /* 640px */) {

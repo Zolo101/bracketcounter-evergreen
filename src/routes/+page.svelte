@@ -7,7 +7,7 @@
     import BFDIE3Results from "$lib/assets/results/bfdie3.png";
     import BFDIE4Results from "$lib/assets/results/bfdie4.png";
     import BFDIE5Results from "$lib/assets/results/bfdie5.png";
-    import { formatRelativeTimeLong } from "$lib";
+    import { formatRelativeTimeLong, tempEditBuffer } from "$lib";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
     import { flip } from "svelte/animate";
@@ -100,7 +100,7 @@
     };
 
     type Contestant = {
-        id: string;
+        id: string; // vote letters
         name: string;
         color: string;
         votes: number;
@@ -161,6 +161,7 @@
 
         const subscription = bc.subscribe("c7qpatzs5iizr7n", async (e) => {
             ({ buffer } = e.record);
+            buffer = tempEditBuffer(buffer);
         });
 
         return () => {
@@ -200,50 +201,54 @@
     {@const image = Characters[`/src/lib/assets/characters/${contestant.name}.webp`].default}
     {@const votes = barWidth[contestant.id].votes.current}
     {@const width = barWidth[contestant.id].width.current}
-    <div class="w-full grow items-center gap-5">
-        <div
-            class="bar-container flex h-15 items-center gap-5 overflow-hidden rounded-md drop-shadow-xl"
-        >
+    {#if votes > 0}
+        <div class="w-full grow items-center gap-5">
             <div
-                class="bar flex h-full items-center rounded-md px-3 leading-4 drop-shadow-xs"
-                style="width: {width}%; background-color: {contestant.color};"
+                class="bar-container flex h-15 items-center gap-5 overflow-hidden rounded-md drop-shadow-xl"
             >
                 <div
-                    class="title relative flex items-baseline gap-2 self-center brightness-175 contrast-125"
-                    style="color: {nameColor};"
+                    class="bar flex h-full items-center rounded-md px-3 leading-4 drop-shadow-xs"
+                    style="width: {width}%; background-color: {contestant.color};"
                 >
-                    <span class="id absolute -left-2 font-mono text-xs font-bold sm:top-3">
-                        {contestant.id.toUpperCase()}
-                    </span>
-                    <span class="name mx-2 font-bold wrap-anywhere text-shadow-sm">
-                        {contestant.name}
-                    </span>
-                </div>
-                <div class="percentage ml-auto flex h-10 items-center max-lg:text-sm!">
-                    <enhanced:img
-                        src={image}
-                        alt=""
-                        class="relative h-10 scale-200 -rotate-15 self-end mask-r-from-40% mask-r-to-80% object-cover object-center"
-                    />
-                    {#if allEpisodes}
-                        <span
-                            class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
-                            style="color: {color};"
-                        >
-                            {votes.toFixed(0)}
+                    <div
+                        class="title relative flex items-baseline gap-2 self-center brightness-175 contrast-125"
+                        style="color: {nameColor};"
+                    >
+                        {#if contestant.id && buffer.votes[contestant.id] > 0}
+                            <span class="id absolute -left-2 font-mono text-xs font-bold sm:top-3">
+                                {contestant.id.toUpperCase()}
+                            </span>
+                        {/if}
+                        <span class="name mx-2 font-bold wrap-anywhere text-shadow-sm">
+                            {contestant.name}
                         </span>
-                    {:else}
-                        <span
-                            class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
-                            style="color: {color};"
-                        >
-                            {votes.toFixed(0)} ({contestant.percentage.toFixed(1)}%)
-                        </span>
-                    {/if}
+                    </div>
+                    <div class="percentage ml-auto flex h-10 items-center max-lg:text-sm!">
+                        <enhanced:img
+                            src={image}
+                            alt=""
+                            class="relative h-10 scale-200 -rotate-15 self-end mask-r-from-40% mask-r-to-80% object-cover object-center"
+                        />
+                        {#if allEpisodes}
+                            <span
+                                class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
+                                style="color: {color};"
+                            >
+                                {votes.toFixed(0)}
+                            </span>
+                        {:else}
+                            <span
+                                class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
+                                style="color: {color};"
+                            >
+                                {votes.toFixed(0)} ({contestant.percentage.toFixed(1)}%)
+                            </span>
+                        {/if}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    {/if}
 {/snippet}
 
 <nav class="flex flex-col gap-2 text-black" bind:clientHeight={navHeight}>
@@ -260,9 +265,9 @@
                 </div>
                 <div>
                     <p>
-                        This isn't official. Prior episode results (unconfirmed): <a
-                            href={BFDIE1Results}>BFDIE1</a
-                        >, <a href={BFDIE2Results}>BFDIE2</a>, <a href={BFDIE3Results}>BFDIE3</a>,
+                        This isn't official. Past results (unconfirmed):<br />
+                        <a href={BFDIE1Results}>BFDIE1</a>, <a href={BFDIE2Results}>BFDIE2</a>,
+                        <a href={BFDIE3Results}>BFDIE3</a>,
                         <a href={BFDIE4Results}>BFDIE4</a>, <a href={BFDIE5Results}>BFDIE5</a>
                     </p>
                     <p>

@@ -2,12 +2,37 @@
     import "./layout.css";
 
     import favicon from "$lib/assets/favicon.png";
+    import embedImage from "$lib/assets/embed.png";
     let { children } = $props();
 </script>
 
 <svelte:head>
     <link rel="icon" href={favicon} />
-    <title>bracketcounter</title>
+    <title>bracketcounter | BFDIE Vote Tracker</title>
+    <meta
+        name="description"
+        content="Live vote tracker for Battle for Dream Island Elsewhere (BFDIE). See real-time elimination vote counts and rankings for all contestants."
+    />
+    <meta
+        name="keywords"
+        content="BFDIE, Battle for Dream Island, bracketcounter, vote tracker, BFDI, elimination votes"
+    />
+    <meta name="author" content="Zelo101" />
+    <meta property="og:title" content="bracketcounter | BFDIE Vote Tracker" />
+    <meta
+        property="og:description"
+        content="Live vote tracker for Battle for Dream Island Elsewhere (BFDIE). See real-time elimination vote counts and rankings for all contestants."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://bc.zelo.dev" />
+    <meta property="og:image" content={embedImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="bracketcounter | BFDIE Vote Tracker" />
+    <meta
+        name="twitter:description"
+        content="Live vote tracker for Battle for Dream Island Elsewhere (BFDIE). See real-time elimination vote counts and rankings for all contestants."
+    />
+    <meta name="twitter:image" content={embedImage} />
     <script
         defer
         src="https://analytics.zelo.dev/script.js"

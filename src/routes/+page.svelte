@@ -8,6 +8,7 @@
     import BFDIE4Results from "$lib/assets/results/bfdie4.png";
     import BFDIE5Results from "$lib/assets/results/bfdie5.png";
     import BFDIE6Results from "$lib/assets/results/bfdie6.png";
+    import BFDIE7Results from "$lib/assets/results/bfdie7.png";
     import { formatRelativeTimeLong, tempEditBuffer } from "$lib";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
@@ -32,17 +33,17 @@
 
     const totalContestantVotes = new Map([
         ["David", 12987 + 12236 + 8762 + 7966 + 5368],
-        ["Sticker", 5326 + 9645 + 7053 + 6043 + 5049 + 5044],
-        ["Needy", 11141 + 7106 + 6821 + 6744 + 6922 + 8754],
-        ["Fern", 19073 + 10030 + 6767 + 7899 + 7497 + 8853],
+        ["Sticker", 5326 + 9645 + 7053 + 6043 + 5049 + 5044 + 6166],
+        ["Needy", 11141 + 7106 + 6821 + 6744 + 6922 + 8754 + 10164],
+        ["Fern", 19073 + 10030 + 6767 + 7899 + 7497 + 8853 + 9782],
         ["Jammy", 7555 + 4432 + 5191 + 4439 + 3203],
         ["Rose", 6801 + 5459 + 3780 + 2751 + 1401],
         ["Beach Ball", 14744 + 5615 + 3394 + 1682 + 1415],
         ["Toothpaste", 1427 + 1765 + 1868 + 1055 + 1233 + 1249],
         ["Ruler", 3300 + 1747 + 1766 + 1822 + 2020],
-        ["Money", 7171 + 2417 + 1177 + 830 + 759 + 7610],
+        ["Money", 7171 + 2417 + 1177 + 830 + 759 + 7610 + 3830],
         ["Hot Dog", 4247 + 1207 + 960 + 796 + 650],
-        ["Sidewalky", 4630 + 2632 + 2521 + 3133 + 3272 + 3291]
+        ["Sidewalky", 4630 + 2632 + 2521 + 3133 + 3272 + 3291 + 4393]
     ]);
 
     // const barTweens = new Map<string, { from: number; to: number }>();
@@ -270,7 +271,7 @@
                         <a href={BFDIE1Results}>BFDIE1</a>, <a href={BFDIE2Results}>BFDIE2</a>,
                         <a href={BFDIE3Results}>BFDIE3</a>,
                         <a href={BFDIE4Results}>BFDIE4</a>, <a href={BFDIE5Results}>BFDIE5</a>,
-                        <a href={BFDIE6Results}>BFDIE6</a>
+                        <a href={BFDIE6Results}>BFDIE6</a>, <a href={BFDIE7Results}>BFDIE7</a>
                     </p>
                     <p>
                         Based on <a href="https://bfb.figgyc.uk/static/gate.html"
@@ -292,7 +293,7 @@
                     class:active={!allEpisodes}
                     onclick={() => (allEpisodes = false)}
                 >
-                    BFDIE 7
+                    BFDIE 8
                 </button>
                 <button
                     class="toggle-btn"

@@ -9,6 +9,7 @@ export { formatRelativeTimeLong } from "./time";
 // since you cannot vote for eliminated contestants in bfdie 6
 export function tempEditBuffer(buffer: SocketMessageData["buffer"]) {
     buffer.config.contestants = Object.assign(buffer.config.contestants, {
+        e: ["Needy", "#dd70d4"],
         f: ["Toothpaste", "#46d0ed"],
         g: ["Beach Ball", "#f05657"],
         h: ["David", "#d6ebec"],
@@ -18,6 +19,7 @@ export function tempEditBuffer(buffer: SocketMessageData["buffer"]) {
         l: ["Rose", "#d62d3f"]
     });
     buffer.votes = Object.assign(buffer.votes, {
+        e: -1,
         f: -1,
         g: -1,
         h: -1,

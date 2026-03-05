@@ -10,6 +10,8 @@
     import BFDIE6Results from "$lib/assets/results/bfdie6.png";
     import BFDIE7Results from "$lib/assets/results/bfdie7.png";
     import BFDIE8Results from "$lib/assets/results/bfdie8.png";
+    import BFDIE9Results from "$lib/assets/results/bfdie9.png";
+    import BFDIETotalResults from "$lib/assets/results/bfdie_total.png";
     import { formatRelativeTimeLong, tempEditBuffer } from "$lib";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
@@ -177,24 +179,24 @@
 {#snippet info()}
     <div>
         <section class="text-xl">
-            <span>VOTING ENDS:</span>
-            <span
+            <span>VOTING HAS ENDED</span>
+            <!-- <span
                 >{new Date(buffer.status.deadline)
                     .toLocaleDateString(undefined, {
                         month: "long",
                         day: "numeric"
                     })
                     .toUpperCase()}</span
-            >
+            > -->
         </section>
-        <section class="max-sm:hidden">
+        <!-- <section class="max-sm:hidden">
             <span
                 ><abbr title="Count from the beginning to catch any vote changes / deletions"
                     >RECOUNTS</abbr
                 > EVERY</span
             >
             <span>{buffer.config.longRefreshTime / 3600} HOURS</span>
-        </section>
+        </section> -->
     </div>
 {/snippet}
 
@@ -273,7 +275,8 @@
                         <a href={BFDIE3Results}>BFDIE3</a>,
                         <a href={BFDIE4Results}>BFDIE4</a>, <a href={BFDIE5Results}>BFDIE5</a>,
                         <a href={BFDIE6Results}>BFDIE6</a>, <a href={BFDIE7Results}>BFDIE7</a>,
-                        <a href={BFDIE8Results}>BFDIE8</a>
+                        <a href={BFDIE8Results}>BFDIE8</a>, <a href={BFDIE9Results}>BFDIE9</a>,
+                        <a href={BFDIETotalResults}>TOTAL</a>
                     </p>
                     <p>
                         Based on <a href="https://bfb.figgyc.uk/static/gate.html"

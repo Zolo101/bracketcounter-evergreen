@@ -4,6 +4,7 @@
 @theme {
     --color-primary: #6075ee;
     --color-secondary: #3b4996;
+    --color-nav: #0c3e78;
 }
 
 @layer utilities {
@@ -12,11 +13,16 @@
     }
 
     html {
-        font-family: "Inter", sans-serif;
+        /* font-family: "Inter", sans-serif; */
+        font-family: "DM Sans", sans-serif;
+        font-optical-sizing: auto;
+        scrollbar-gutter: stable;
     }
 
     body {
-        height: 100vh;
+        min-height: 100vh;
+        min-height: 100dvh;
+        color: white;
     }
 
     a {
@@ -28,12 +34,12 @@
         }
     }
 
-    button {
+    /* button {
         padding: 6px;
         margin-inline: 5px;
         background-color: var(--color-primary);
         border-radius: 5px;
-    }
+    } */
 }
 
 @view-transition {

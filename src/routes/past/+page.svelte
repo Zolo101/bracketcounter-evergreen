@@ -15,10 +15,10 @@
     let { data }: PageProps = $props();
 </script>
 
-<main class="flex flex-col gap-2 text-2xl text-black">
+<main class="flex flex-col gap-2 text-2xl text-white">
     <a href="/">GO BACK</a>
 
-    <p>all of these are unofficial, unconfirmed past results</p>
+    <p>all of these are unconfirmed past results</p>
     <h1 class="text-3xl font-bold">BFDIE</h1>
     <p>
         <a href={BFDIE1Results}>BFDIE1</a>, <a href={BFDIE2Results}>BFDIE2</a>,

@@ -10,12 +10,43 @@
     import { Tween } from "svelte/motion";
 
     const Characters: Record<string, { default: string }> = import.meta.glob(
-        "$lib/assets/characters/*.webp",
+        "$lib/assets/icons/*.png",
         {
             eager: true, // assuming we're using all the images right away
             query: "?url"
         }
     );
+
+    const Sounds: Record<string, { default: string }> = import.meta.glob(
+        "$lib/assets/sounds/*.ogg",
+        {
+            eager: true,
+            query: "?url"
+        }
+    );
+
+    let currentAudio: HTMLAudioElement | undefined;
+    let playingContestants = $state<Record<string, number>>({});
+
+    function playContestantSound(name: string) {
+        const sound = Sounds[`/src/lib/assets/sounds/${name}.ogg`]?.default;
+        if (!sound) return;
+
+        // currentAudio?.pause();
+        const audio = new Audio(sound);
+        currentAudio = audio;
+        playingContestants[name] = (playingContestants[name] ?? 0) + 1;
+
+        let finished = false;
+        const finish = () => {
+            if (finished) return;
+            finished = true;
+            playingContestants[name] = Math.max((playingContestants[name] ?? 1) - 1, 0);
+        };
+
+        audio.onended = finish;
+        void audio.play().catch(finish);
+    }
 
     const { data }: { data: PageData } = $props();
     let { visitors, buffer } = $derived(data);
@@ -113,6 +144,7 @@
         return () => {
             clearInterval(interval);
             subscription.then((s) => s());
+            currentAudio?.pause();
         };
     });
 </script>
@@ -137,7 +169,7 @@
             >
             <span>{buffer.config.longRefreshTime / 3600} HOURS</span>
         </section>
-        <p class="text-xs">
+        <p class="absolute right-0 bottom-0 m-2 text-xs">
             Based on <a href="https://bfb.figgyc.uk/static/gate.html">figgyc's bracketcounter</a>
         </p>
     </div>
@@ -202,7 +234,8 @@
 {#snippet cell(contestant: Contestant)}
     {@const nameColor = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
     {@const color = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
-    {@const image = Characters[`/src/lib/assets/characters/${contestant.name}.webp`]?.default}
+    {@const image = Characters[`/src/lib/assets/icons/${contestant.name}.png`]?.default}
+    {@const sound = Sounds[`/src/lib/assets/sounds/${contestant.name}.ogg`]?.default}
     {@const votes = barWidth[contestant.id].votes.current}
     <!-- {#if votes > 0} -->
     <div class="h-full w-full grow items-center gap-5">
@@ -210,10 +243,22 @@
             class="bar-container flex h-full w-full justify-center gap-5 overflow-hidden rounded-md drop-shadow-xl"
         >
             <div
-                class="bar flex h-full flex-col justify-center rounded-md px-3 leading-4 drop-shadow-xs"
+                class="bar flex h-full flex-col justify-center rounded-md leading-4 drop-shadow-xs"
             >
                 <!-- style="background-color: {contestant.color};" -->
-                <enhanced:img src={image} alt="" class="m-auto h-12" />
+                <button
+                    type="button"
+                    class={[
+                        "m-auto enabled:cursor-pointer disabled:cursor-default",
+                        playingContestants[contestant.name] > 0 && "animate-spin"
+                    ]}
+                    disabled={!sound}
+                    onclick={() => playContestantSound(contestant.name)}
+                >
+                    {#if image}
+                        <enhanced:img src={image} alt={contestant.name} class="h-24" />
+                    {/if}
+                </button>
                 <!-- <div
                     class="title relative flex items-baseline gap-2 self-center brightness-175 contrast-125"
                     style="color: {nameColor};"
@@ -222,18 +267,18 @@
                     {/if}
                     </div> -->
                 <!-- <span class="id absolute font-mono text-xs font-bold sm:top-3"> </span> -->
-                <div>
+                <div class="absolute right-5 bottom-6 max-lg:bottom-6">
                     <!-- <span class="name text-xs font-bold wrap-anywhere text-shadow-sm">
                         {contestant.name}
                     </span> -->
-                    <span class="text-xs font-bold">
-                        [{contestant.id.toUpperCase()}]
+                    <span class="text-[9px] font-bold opacity-50">
+                        {contestant.id.toUpperCase()}
                     </span>
                 </div>
 
                 <div class="percentage flex h-10 items-center justify-center max-lg:text-sm!">
                     <span
-                        class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
+                        class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-lg:text-4xl max-sm:text-shadow-md"
                     >
                         <!-- style="color: {color};" -->
                         {votes.toFixed(0)}
@@ -246,11 +291,11 @@
     <!-- {/if} -->
 {/snippet}
 
-<nav class="flex flex-col gap-2 text-black" bind:clientHeight={navHeight}>
+<nav class="bg- flex flex-col gap-2 text-white" bind:clientHeight={navHeight}>
     <section class="flex items-center justify-between gap-2 text-center max-sm:flex-col">
         <div class="text-xs">
             <div
-                class="flex items-center justify-center gap-10 text-lg max-sm:flex-col max-sm:gap-1 max-sm:text-xs"
+                class="flex items-center justify-center gap-10 text-lg max-sm:flex-col max-sm:gap-1 max-sm:text-sm"
             >
                 <div class="flex items-center gap-10">
                     <BCLOGO width="96" height="96" />
@@ -263,12 +308,14 @@
                         This isn't official. <a href="/past">Past counts</a>
                     </p>
                     <p>
-                        The contestant with the <strong class="text-xl font-black">least</strong> votes
-                        will rejoin. (according to Two...)
+                        The contestant with the <strong class="font-black">least</strong>
+                        votes will rejoin.
                     </p>
-                    <p>
-                        There is also a <a href="https://forms.gle/m9VrLxqktU5KX7GW8">google form</a
-                        > which we cannot count.
+                    <!-- (according to <em class="text-green-400">Two...</em>) -->
+                    <p class="font-bold text-blue-100">
+                        *We cannot count the <a href="https://forms.gle/m9VrLxqktU5KX7GW8"
+                            >google form</a
+                        > votes!!!
                     </p>
                 </div>
             </div>
@@ -289,14 +336,16 @@
             </div>
         </section> -->
         <section>
-            <div class="text-2xl font-bold">
-                <p>Total Votes: {buffer.total.toLocaleString()}</p>
+            <div class="text-2xl font-bold max-lg:text-4xl">
+                <p>Total Votes: {buffer.total.toLocaleString()}*</p>
             </div>
             <div class="text-xs">
                 <span class=""
-                    >{visitors} {visitors === 1 ? "user" : "users"} watching on bc.zelo.dev</span
+                    >{visitors.toLocaleString()}
+                    {visitors === 1 ? "user" : "users"} watching on bc.zelo.dev</span
                 >
                 <!-- what a hack lmao -->
+                <br />
                 <div class="mx-1 inline-block h-2 w-2 animate-ping rounded-full bg-green-500"></div>
                 <div
                     class="relative right-4.75 mx-1 inline-block h-2 w-2 rounded-full bg-green-500"
@@ -325,7 +374,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 1rem;
     }
 
     .toggle-btn {
@@ -357,7 +406,7 @@
 
     .bar {
         width: 96px;
-        height: 112px;
+        height: 120px;
         container-type: inline-size;
         /* background-image: url("$lib/assets/dots_alpha.png"); */
         background-size: 32px;

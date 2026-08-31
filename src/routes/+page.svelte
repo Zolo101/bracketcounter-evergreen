@@ -1,18 +1,8 @@
 <script lang="ts">
     import type { SocketMessageData } from "$lib/types";
     import Pocketbase from "pocketbase";
-    import BCLOGO from "$lib/assets/bc_green.svg?component";
-    import BFDIE1Results from "$lib/assets/results/bfdie1.png";
-    import BFDIE2Results from "$lib/assets/results/bfdie2.png";
-    import BFDIE3Results from "$lib/assets/results/bfdie3.png";
-    import BFDIE4Results from "$lib/assets/results/bfdie4.png";
-    import BFDIE5Results from "$lib/assets/results/bfdie5.png";
-    import BFDIE6Results from "$lib/assets/results/bfdie6.png";
-    import BFDIE7Results from "$lib/assets/results/bfdie7.png";
-    import BFDIE8Results from "$lib/assets/results/bfdie8.png";
-    import BFDIE9Results from "$lib/assets/results/bfdie9.png";
-    import BFDIETotalResults from "$lib/assets/results/bfdie_total.png";
-    import { formatRelativeTimeLong, tempEditBuffer } from "$lib";
+    import BCLOGO from "$lib/assets/bc_blurple.svg?component";
+    import { formatRelativeTimeLong } from "$lib";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
     import { flip } from "svelte/animate";
@@ -34,75 +24,22 @@
     const client = new Pocketbase("https://cdn.zelo.dev");
     const bc = client.collection<SocketMessageData>("bracketcounter");
 
-    const totalContestantVotes = new Map([
-        ["David", 12987 + 12236 + 8762 + 7966 + 5368],
-        ["Sticker", 5326 + 9645 + 7053 + 6043 + 5049 + 5044 + 6166 + 7579],
-        ["Needy", 11141 + 7106 + 6821 + 6744 + 6922 + 8754 + 10164],
-        ["Fern", 19073 + 10030 + 6767 + 7899 + 7497 + 8853 + 9782 + 15201],
-        ["Jammy", 7555 + 4432 + 5191 + 4439 + 3203],
-        ["Rose", 6801 + 5459 + 3780 + 2751 + 1401],
-        ["Beach Ball", 14744 + 5615 + 3394 + 1682 + 1415],
-        ["Toothpaste", 1427 + 1765 + 1868 + 1055 + 1233 + 1249],
-        ["Ruler", 3300 + 1747 + 1766 + 1822 + 2020],
-        ["Money", 7171 + 2417 + 1177 + 830 + 759 + 7610 + 3830 + 3783],
-        ["Hot Dog", 4247 + 1207 + 960 + 796 + 650],
-        ["Sidewalky", 4630 + 2632 + 2521 + 3133 + 3272 + 3291 + 4393 + 5236]
-    ]);
-
     // const barTweens = new Map<string, { from: number; to: number }>();
 
     // worst hack in the world ??
-    let allEpisodes = $state(false);
-    const barWidth: Record<any, { width: Tween<number>; votes: Tween<number> }> = {
-        a: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["a"], { easing: cubicInOut, duration: 2000 })
-        },
-        b: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["b"], { easing: cubicInOut, duration: 2000 })
-        },
-        c: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["c"], { easing: cubicInOut, duration: 2000 })
-        },
-        d: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["d"], { easing: cubicInOut, duration: 2000 })
-        },
-        e: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["e"], { easing: cubicInOut, duration: 2000 })
-        },
-        f: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["f"], { easing: cubicInOut, duration: 2000 })
-        },
-        g: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["g"], { easing: cubicInOut, duration: 2000 })
-        },
-        h: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["h"], { easing: cubicInOut, duration: 2000 })
-        },
-        i: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["i"], { easing: cubicInOut, duration: 2000 })
-        },
-        j: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["j"], { easing: cubicInOut, duration: 2000 })
-        },
-        k: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["k"], { easing: cubicInOut, duration: 2000 })
-        },
-        l: {
-            width: new Tween(0, { easing: cubicInOut, duration: 2000 }),
-            votes: new Tween(buffer.votes["l"], { easing: cubicInOut, duration: 2000 })
+    /** false = least, true = most */
+    let sort = $state(false);
+    // const barWidth: Record<any, { width: Tween<number>; votes: Tween<number> }> = {
+    const barWidth: Record<any, { votes: Tween<number> }> = {};
+
+    // console.log(buffer.votes);
+    for (const id of Object.keys(buffer.votes)) {
+        if (!barWidth[id]) {
+            barWidth[id] = {
+                votes: new Tween(buffer.votes[id], { easing: cubicInOut, duration: 2000 })
+            };
         }
-    };
+    }
 
     type Contestant = {
         id: string; // vote letters
@@ -112,40 +49,42 @@
         percentage: number;
     };
 
-    // Derived state: sort contestants by vote count and calculate percentages
+    // sort contestants by vote count and calculate percentages
     let sortedContestants: Contestant[] = $derived(
         Object.entries(buffer.votes)
             .map(([id, votes]) => {
                 const [name, color] = buffer.config.contestants[id] || ["Unknown", "#cccccc"];
                 const percentage = buffer.total > 0 ? (votes / buffer.total) * 100 : 0;
-                if (allEpisodes) {
-                    const totalVotes = totalContestantVotes.get(name) || 0;
+                if (sort) {
+                    // const totalVotes = totalContestantVotes.get(name) || 0;
                     return {
                         id,
                         name,
                         color,
-                        votes: totalVotes + votes,
-                        percentage: buffer.total > 0 ? (totalVotes / buffer.total) * 100 : 0
+                        // votes: totalVotes + votes,
+                        votes
+                        // percentage: buffer.total > 0 ? (totalVotes / buffer.total) * 100 : 0
                     };
                 }
                 return { id, name, color, votes, percentage };
             })
-            .sort((a, b) => b.votes - a.votes)
+            // .sort((a, b) => b.votes - a.votes)
+            .sort((a, b) => a.votes - b.votes)
     );
 
     let firstTime = true;
     $effect(() => {
         for (const contestant of sortedContestants) {
             if (firstTime) {
-                barWidth[contestant.id].width.set(
-                    (contestant.votes / sortedContestants[0].votes) * 100,
-                    { duration: 0 }
-                );
+                // barWidth[contestant.id].width.set(
+                //     (contestant.votes / sortedContestants[0].votes) * 100,
+                //     { duration: 0 }
+                // );
                 // barWidth[contestant.id].votes.set(contestant.votes, { duration: 0 });
             } else {
-                barWidth[contestant.id].width.set(
-                    (contestant.votes / sortedContestants[0].votes) * 100
-                );
+                // barWidth[contestant.id].width.set(
+                //     (contestant.votes / sortedContestants[0].votes) * 100
+                // );
                 barWidth[contestant.id].votes.set(contestant.votes);
             }
         }
@@ -166,7 +105,9 @@
 
         const subscription = bc.subscribe("c7qpatzs5iizr7n", async (e) => {
             ({ buffer } = e.record);
-            buffer = tempEditBuffer(buffer);
+
+            // dont know if i have to do it twice but just in case...
+            buffer.config.contestants["a5"][0] = "Naily";
         });
 
         return () => {
@@ -179,24 +120,26 @@
 {#snippet info()}
     <div>
         <section class="text-xl">
-            <span>VOTING HAS ENDED</span>
-            <!-- <span
+            <span
                 >{new Date(buffer.status.deadline)
                     .toLocaleDateString(undefined, {
                         month: "long",
                         day: "numeric"
                     })
                     .toUpperCase()}</span
-            > -->
+            >
         </section>
-        <!-- <section class="max-sm:hidden">
+        <section class="max-sm:hidden">
             <span
                 ><abbr title="Count from the beginning to catch any vote changes / deletions"
                     >RECOUNTS</abbr
                 > EVERY</span
             >
             <span>{buffer.config.longRefreshTime / 3600} HOURS</span>
-        </section> -->
+        </section>
+        <p class="text-xs">
+            Based on <a href="https://bfb.figgyc.uk/static/gate.html">figgyc's bracketcounter</a>
+        </p>
     </div>
 {/snippet}
 
@@ -228,13 +171,13 @@
                             {contestant.name}
                         </span>
                     </div>
-                    <div class="percentage ml-auto flex h-10 items-center max-lg:text-sm!">
+                    <div class="percentage ml-auto flex h-10 items-center">
                         <enhanced:img
                             src={image}
                             alt=""
                             class="relative h-10 scale-200 -rotate-15 self-end mask-r-from-40% mask-r-to-80% object-cover object-center"
                         />
-                        {#if allEpisodes}
+                        {#if sort}
                             <span
                                 class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
                                 style="color: {color};"
@@ -256,6 +199,53 @@
     {/if}
 {/snippet}
 
+{#snippet cell(contestant: Contestant)}
+    {@const nameColor = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
+    {@const color = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
+    {@const image = Characters[`/src/lib/assets/characters/${contestant.name}.webp`]?.default}
+    {@const votes = barWidth[contestant.id].votes.current}
+    <!-- {#if votes > 0} -->
+    <div class="h-full w-full grow items-center gap-5">
+        <div
+            class="bar-container flex h-full w-full justify-center gap-5 overflow-hidden rounded-md drop-shadow-xl"
+        >
+            <div
+                class="bar flex h-full flex-col justify-center rounded-md px-3 leading-4 drop-shadow-xs"
+            >
+                <!-- style="background-color: {contestant.color};" -->
+                <enhanced:img src={image} alt="" class="m-auto h-12" />
+                <!-- <div
+                    class="title relative flex items-baseline gap-2 self-center brightness-175 contrast-125"
+                    style="color: {nameColor};"
+                >
+                    {#if contestant.id && buffer.votes[contestant.id] > 0}
+                    {/if}
+                    </div> -->
+                <!-- <span class="id absolute font-mono text-xs font-bold sm:top-3"> </span> -->
+                <div>
+                    <!-- <span class="name text-xs font-bold wrap-anywhere text-shadow-sm">
+                        {contestant.name}
+                    </span> -->
+                    <span class="text-xs font-bold">
+                        [{contestant.id.toUpperCase()}]
+                    </span>
+                </div>
+
+                <div class="percentage flex h-10 items-center justify-center max-lg:text-sm!">
+                    <span
+                        class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
+                    >
+                        <!-- style="color: {color};" -->
+                        {votes.toFixed(0)}
+                        <!-- ({contestant.percentage.toFixed(1)}%) -->
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- {/if} -->
+{/snippet}
+
 <nav class="flex flex-col gap-2 text-black" bind:clientHeight={navHeight}>
     <section class="flex items-center justify-between gap-2 text-center max-sm:flex-col">
         <div class="text-xs">
@@ -270,18 +260,15 @@
                 </div>
                 <div>
                     <p>
-                        This isn't official. Past results (unconfirmed):<br />
-                        <a href={BFDIE1Results}>BFDIE1</a>, <a href={BFDIE2Results}>BFDIE2</a>,
-                        <a href={BFDIE3Results}>BFDIE3</a>,
-                        <a href={BFDIE4Results}>BFDIE4</a>, <a href={BFDIE5Results}>BFDIE5</a>,
-                        <a href={BFDIE6Results}>BFDIE6</a>, <a href={BFDIE7Results}>BFDIE7</a>,
-                        <a href={BFDIE8Results}>BFDIE8</a>, <a href={BFDIE9Results}>BFDIE9</a>,
-                        <a href={BFDIETotalResults}>TOTAL</a>
+                        This isn't official. <a href="/past">Past counts</a>
                     </p>
                     <p>
-                        Based on <a href="https://bfb.figgyc.uk/static/gate.html"
-                            >figgyc's bracketcounter</a
-                        >.
+                        The contestant with the <strong class="text-xl font-black">least</strong> votes
+                        will rejoin. (according to Two...)
+                    </p>
+                    <p>
+                        There is also a <a href="https://forms.gle/m9VrLxqktU5KX7GW8">google form</a
+                        > which we cannot count.
                     </p>
                 </div>
             </div>
@@ -291,24 +278,16 @@
         </section>
     </section>
     <div class="mb-5 flex items-center gap-2 max-sm:flex-col-reverse">
-        <section class="w-50">
-            <div class="flex overflow-hidden rounded ring-2 ring-lime-500">
-                <button
-                    class="toggle-btn"
-                    class:active={!allEpisodes}
-                    onclick={() => (allEpisodes = false)}
-                >
-                    BFDIE 9
+        <!-- <section class="w-50">
+            <div class="flex overflow-hidden rounded ring-2 ring-secondary">
+                <button class="toggle-btn" class:active={!sort} onclick={() => (sort = false)}>
+                    LEAST
                 </button>
-                <button
-                    class="toggle-btn"
-                    class:active={allEpisodes}
-                    onclick={() => (allEpisodes = true)}
-                >
-                    ALL
+                <button class="toggle-btn" class:active={sort} onclick={() => (sort = true)}>
+                    MOST
                 </button>
             </div>
-        </section>
+        </section> -->
         <section>
             <div class="text-2xl font-bold">
                 <p>Total Votes: {buffer.total.toLocaleString()}</p>
@@ -327,52 +306,47 @@
         </section>
     </div>
 </nav>
-<main class="mb-10 w-full grow" style="max-height: calc(100vh - {navHeight}px - 150px);">
-    <div class="flex h-full flex-col items-stretch gap-1">
+<!-- <main class="mb-10 w-full grow" style="max-height: calc(100vh - {navHeight}px - 150px);"> -->
+<main class="mb-10 w-full grow">
+    <div class={["shabang gap-1"]}>
         {#each sortedContestants as contestant (contestant.id)}
-            <div animate:flip={{ easing: cubicOut }}>
-                {@render bar(contestant)}
+            <!-- <div animate:flip={{ easing: cubicOut }}> -->
+            <div>
+                <!-- {@render bar(contestant)} -->
+                {@render cell(contestant)}
             </div>
         {/each}
     </div>
 </main>
 
 <style>
-    button {
-        padding: 6px;
-        margin-inline: 5px;
-        background-color: var(--color-lime-900);
-        border-radius: 5px;
+    /* the whole shabang */
+    .shabang {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+        flex-direction: column;
+        gap: 0.5rem;
     }
 
     .toggle-btn {
         flex: 1;
         padding: 8px 16px;
         margin: 0;
-        background-color: var(--color-lime-900);
+        background-color: var(--color-primary);
         border: none;
         border-radius: 0;
-        color: var(--color-lime-500);
+        color: var(--color-secondary);
         font-weight: var(--font-weight-bold);
         cursor: pointer;
         transition: all 0.3s ease;
 
         &:hover:not(.active) {
-            background-color: var(--color-lime-800);
+            background-color: var(--color-primary);
         }
 
         &.active {
-            background-color: var(--color-lime-500);
-            color: var(--color-lime-900);
-        }
-    }
-
-    a {
-        color: var(--color-cyan-500);
-        font-weight: var(--font-weight-bold);
-
-        &:hover {
-            text-decoration: underline;
+            background-color: var(--color-secondary);
+            color: var(--color-primary);
         }
     }
 
@@ -382,8 +356,10 @@
     } */
 
     .bar {
+        width: 96px;
+        height: 112px;
         container-type: inline-size;
-        background-image: url("$lib/assets/dots_alpha.png");
+        /* background-image: url("$lib/assets/dots_alpha.png"); */
         background-size: 32px;
         font-size: 2rem;
         /* transition: width 2s ease-in-out; */
@@ -394,12 +370,11 @@
         line-height: 1;
     }
 
-    @media (height < 60rem /* 640px */) {
+    /* @media (height < 60rem) {
         .bar-container {
-            height: calc(var(--spacing) * 10) /* 2.5rem = 40px */;
+            height: calc(var(--spacing) * 10);
         }
     }
-
     @container (width < 400px) {
         .bar {
             width: 100%;
@@ -450,8 +425,6 @@
                 position: absolute;
                 left: calc(100% + 0px);
                 top: 6px;
-                /* font-size: 0.5rem; */
-                /* line-height: 0.8; */
 
                 width: 110px;
             }
@@ -467,5 +440,5 @@
                 }
             }
         }
-    }
+    } */
 </style>

@@ -8,29 +8,29 @@
 
 <svelte:head>
     <link rel="icon" href={favicon} />
-    <title>bracketcounter | BFDIE Vote Tracker</title>
+    <title>bracketcounter | TPOT Vote Tracker</title>
     <meta
         name="description"
-        content="Live vote tracker for Battle for Dream Island Elsewhere (BFDIE). See real-time elimination vote counts and rankings for all contestants."
+        content="Live vote tracker for BFDI: The Power of Two (TPOT). See real-time elimination vote counts and rankings for rejoining contestants."
     />
     <meta
         name="keywords"
-        content="BFDIE, Battle for Dream Island, bracketcounter, vote tracker, BFDI, elimination votes"
+        content="TPOT, Battle for Dream Island, The Power Of Two, bracketcounter, vote tracker, BFDI, BFDIE, elimination votes"
     />
     <meta name="author" content="Zelo101" />
-    <meta property="og:title" content="bracketcounter | BFDIE Vote Tracker" />
+    <meta property="og:title" content="bracketcounter | TPOT Vote Tracker" />
     <meta
         property="og:description"
-        content="Live vote tracker for Battle for Dream Island Elsewhere (BFDIE). See real-time elimination vote counts and rankings for all contestants."
+        content="Live vote tracker for BFDI: The Power of Two (TPOT). See real-time elimination vote counts and rankings for rejoining contestants."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://bc.zelo.dev" />
     <meta property="og:image" content={embedImage} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="bracketcounter | BFDIE Vote Tracker" />
+    <meta name="twitter:title" content="bracketcounter | TPOT Vote Tracker" />
     <meta
         name="twitter:description"
-        content="Live vote tracker for Battle for Dream Island Elsewhere (BFDIE). See real-time elimination vote counts and rankings for all contestants."
+        content="Live vote tracker for BFDI: The Power of Two (TPOT). See real-time elimination vote counts and rankings for rejoining contestants."
     />
     <meta name="twitter:image" content={embedImage} />
     <script
@@ -41,7 +41,8 @@
 </svelte:head>
 <div class="container2 m-auto flex h-full flex-col">{@render children()}</div>
 <div class="background2"></div>
-<enhanced:img class="background" src="$lib/assets/thanks1.png" alt="" />
+
+<!-- <enhanced:img class="background" src="$lib/assets/thanks.png" alt="" /> -->
 
 <style>
     .background {
@@ -59,7 +60,8 @@
         height: 100%;
         z-index: -2;
         /* background-color: #a2deec; */
-        background-color: #a6e0ec;
+        /* background-color: #a6e0ec; */
+        background-color: lightblue;
     }
 
     .container2 {

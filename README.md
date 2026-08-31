@@ -1,6 +1,6 @@
 # bracketcounter evergreen client
 
-![bracketcountervevergreen logo](src/lib/assets/bc_green.svg)
+![bracketcountervevergreen logo](src/lib/assets/bc_blurple.svg)
 
 ### The forevercounter to [bracketcounter](https://github.com/Zolo101/bracketcounter)
 

@@ -135,16 +135,39 @@
             currentDate = new Date();
         }, 1000);
 
-        const subscription = bc.subscribe("c7qpatzs5iizr7n", async (e) => {
-            ({ buffer } = e.record);
+        let cancelled = false;
+        let unsubscribe: (() => void) | undefined;
 
-            // dont know if i have to do it twice but just in case...
+        const updateBuffer = (nextBuffer: SocketMessageData["buffer"]) => {
+            buffer = nextBuffer;
+
+            // Server has it as Needle but needle is C2, so this is a fix for that goofy typo
             buffer.config.contestants["a5"][0] = "Naily";
-        });
+        };
+
+        const initialiseCounts = async () => {
+            try {
+                const record = await bc.getOne("c7qpatzs5iizr7n");
+                if (!cancelled) updateBuffer(record.buffer);
+            } catch (error) {
+                console.error("Failed to fetch the latest counts", error);
+            }
+
+            if (cancelled) return;
+
+            unsubscribe = await bc.subscribe("c7qpatzs5iizr7n", (e) => {
+                updateBuffer(e.record.buffer);
+            });
+
+            if (cancelled) unsubscribe();
+        };
+
+        void initialiseCounts();
 
         return () => {
+            cancelled = true;
             clearInterval(interval);
-            subscription.then((s) => s());
+            unsubscribe?.();
             currentAudio?.pause();
         };
     });

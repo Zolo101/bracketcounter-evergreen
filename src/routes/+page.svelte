@@ -8,6 +8,7 @@
     import { flip } from "svelte/animate";
     import { cubicIn, cubicInOut, cubicOut } from "svelte/easing";
     import { Tween } from "svelte/motion";
+    import QR from "$lib/assets/qr.png";
 
     const Characters: Record<string, { default: string }> = import.meta.glob(
         "$lib/assets/icons/*.png",
@@ -150,7 +151,7 @@
 </script>
 
 {#snippet info()}
-    <div>
+    <div class="py-5">
         <section class="text-xl">
             <span
                 >{new Date(buffer.status.deadline)
@@ -168,6 +169,10 @@
                 > EVERY</span
             >
             <span>{buffer.config.longRefreshTime / 3600} HOURS</span>
+        </section>
+        <section class="flex items-center gap-2 italic max-sm:hidden">
+            <span class="font-normal">View the counts live on <strong>bc.zelo.dev</strong></span>
+            <img src={QR} alt="QR Code for bc.zelo.dev" class="w-16 invert" />
         </section>
         <p class="absolute right-0 bottom-0 m-2 text-xs">
             Based on <a href="https://bfb.figgyc.uk/static/gate.html">figgyc's bracketcounter</a>
@@ -281,7 +286,7 @@
                         class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-lg:text-4xl max-sm:text-shadow-md"
                     >
                         <!-- style="color: {color};" -->
-                        {votes.toFixed(0)}
+                        {Math.floor(votes).toLocaleString()}
                         <!-- ({contestant.percentage.toFixed(1)}%) -->
                     </span>
                 </div>
@@ -313,8 +318,9 @@
                     </p>
                     <!-- (according to <em class="text-green-400">Two...</em>) -->
                     <p class="font-bold text-blue-100">
-                        *We cannot count the <a href="https://forms.gle/m9VrLxqktU5KX7GW8"
-                            >google form</a
+                        *We cannot count the <a
+                            target="_blank"
+                            href="https://forms.gle/m9VrLxqktU5KX7GW8">google form</a
                         > votes!!!
                     </p>
                 </div>
@@ -340,12 +346,12 @@
                 <p>Total Votes: {buffer.total.toLocaleString()}*</p>
             </div>
             <div class="text-xs">
-                <span class=""
+                <!-- <span class=""
                     >{visitors.toLocaleString()}
                     {visitors === 1 ? "user" : "users"} watching on bc.zelo.dev</span
-                >
+                > -->
                 <!-- what a hack lmao -->
-                <br />
+                <!-- <br /> -->
                 <div class="mx-1 inline-block h-2 w-2 animate-ping rounded-full bg-green-500"></div>
                 <div
                     class="relative right-4.75 mx-1 inline-block h-2 w-2 rounded-full bg-green-500"

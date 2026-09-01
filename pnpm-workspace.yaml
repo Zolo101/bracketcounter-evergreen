@@ -1,3 +1,7 @@
+packages:
+    - "."
+
 onlyBuiltDependencies:
-  - esbuild
-  - '@tailwindcss/oxide'
+    - "@tailwindcss/oxide"
+    - esbuild
+    - sharp

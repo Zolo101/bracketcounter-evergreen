@@ -17,11 +17,13 @@
         font-family: "DM Sans", sans-serif;
         font-optical-sizing: auto;
         scrollbar-gutter: stable;
+        background-color: black;
     }
 
     body {
         min-height: 100vh;
         min-height: 100dvh;
+        background-color: black;
         color: white;
     }
 

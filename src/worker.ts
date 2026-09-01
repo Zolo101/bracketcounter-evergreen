@@ -103,7 +103,7 @@ async function getViewerCount(env: Env) {
 
     return json(viewerCount, {
         headers: {
-            "Cache-Control": "public, max-age=60"
+            "Cache-Control": "public, max-age=600"
         }
     });
 }

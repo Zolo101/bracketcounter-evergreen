@@ -192,7 +192,7 @@
 
         void initialiseCounts();
         void updateViewerCount();
-        const viewerCountInterval = setInterval(() => void updateViewerCount(), 60_000);
+        const viewerCountInterval = setInterval(() => void updateViewerCount(), 600_000);
 
         return () => {
             cancelled = true;

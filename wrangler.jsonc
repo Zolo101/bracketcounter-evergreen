@@ -1,34 +1,27 @@
 {
-	"$schema": "./node_modules/wrangler/config-schema.json",
-	"name": "bracketcounter",
-	"main": "./src/worker.ts",
-	"compatibility_date": "2026-09-01",
-	"assets": {
-		"directory": "./build",
-		"binding": "ASSETS",
-		"run_worker_first": [
-			"/api/*"
-		]
-	},
-	"kv_namespaces": [
-		{
-			"binding": "VIEWER_COUNTS",
-			"id": "bb49434153cd486ea0536aba7d7e347e"
-		}
-	],
-	"vars": {
-		"UMAMI_API_BASE_URL": "https://analytics.zelo.dev",
-		"UMAMI_WEBSITE_ID": "634d53b7-0a46-4caf-82a8-95db35ba1f6d"
-	},
-	"secrets": {
-		"required": [
-			"UMAMI_USERNAME",
-			"UMAMI_PASSWORD"
-		]
-	},
-	"triggers": {
-		"crons": [
-			"*/5 * * * *"
-		]
-	}
+    "$schema": "./node_modules/wrangler/config-schema.json",
+    "name": "bracketcounter",
+    "main": "./src/worker.ts",
+    "compatibility_date": "2026-09-01",
+    "assets": {
+        "directory": "./build",
+        "binding": "ASSETS",
+        "run_worker_first": ["/api/*"]
+    },
+    "kv_namespaces": [
+        {
+            "binding": "VIEWER_COUNTS",
+            "id": "bb49434153cd486ea0536aba7d7e347e"
+        }
+    ],
+    "vars": {
+        "UMAMI_API_BASE_URL": "https://analytics.zelo.dev",
+        "UMAMI_WEBSITE_ID": "634d53b7-0a46-4caf-82a8-95db35ba1f6d"
+    },
+    "secrets": {
+        "required": ["UMAMI_USERNAME", "UMAMI_PASSWORD"]
+    },
+    "triggers": {
+        "crons": ["*/15 * * * *"]
+    }
 }

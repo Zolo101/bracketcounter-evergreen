@@ -194,9 +194,7 @@
             <span class="font-normal">View the counts live on <strong>bc.zelo.dev</strong></span>
             <img src={QR} alt="QR Code for bc.zelo.dev" class="w-16 invert" />
         </section>
-        <p class="absolute right-0 bottom-0 m-2 text-xs">
-            Based on <a href="https://bfb.figgyc.uk/static/gate.html">figgyc's bracketcounter</a>
-        </p>
+        <p class="text-xs"></p>
     </div>
 {/snippet}
 
@@ -317,7 +315,7 @@
 {/snippet}
 
 <nav class="bg- flex flex-col gap-2 text-white" bind:clientHeight={navHeight}>
-    <section class="flex items-center justify-between gap-2 text-center max-sm:flex-col">
+    <section class="flex items-center justify-between gap-2 max-sm:flex-col">
         <div class="text-xs">
             <div
                 class="flex items-center justify-center gap-10 text-lg max-sm:flex-col max-sm:gap-1 max-sm:text-sm"
@@ -330,7 +328,10 @@
                 </div>
                 <div>
                     <p>
-                        This isn't official. <a href="/past">Past counts</a>
+                        Unofficial vote counter for TPOT 25, based on <a
+                            target="_blank"
+                            href="https://bfb.figgyc.uk/static/gate.html">figgyc's bracketcounter</a
+                        >. <a href="/past">BFDIE results</a>
                     </p>
                     <p>
                         The contestant with the <strong class="font-black">least</strong>

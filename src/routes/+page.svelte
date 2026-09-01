@@ -170,7 +170,7 @@
 
         const initialiseCounts = async () => {
             try {
-                const record = await bc.getOne("c7qpatzs5iizr7n");
+                const record = await bc.getOne("fq6gqvwz3mjqeza");
                 if (!cancelled) {
                     updateBuffer(record.buffer, false);
                     countsReady = true;
@@ -182,7 +182,7 @@
 
             if (cancelled) return;
 
-            unsubscribe = await bc.subscribe("c7qpatzs5iizr7n", (e) => {
+            unsubscribe = await bc.subscribe("fq6gqvwz3mjqeza", (e) => {
                 updateBuffer(e.record.buffer);
                 countsReady = true;
             });

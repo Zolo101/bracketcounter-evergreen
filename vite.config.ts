@@ -7,8 +7,8 @@ import svg from "@poppanator/sveltekit-svg";
 export default defineConfig({
     plugins: [
         tailwindcss(),
-        sveltekit(),
         enhancedImages(),
+        sveltekit(),
         svg({ svgoOptions: { plugins: [{ name: "prefixIds" }] } })
     ]
 });

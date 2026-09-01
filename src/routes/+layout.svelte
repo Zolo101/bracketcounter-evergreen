@@ -45,7 +45,13 @@
         rel="stylesheet"
     />
 </svelte:head>
-<enhanced:img class="background" src="$lib/assets/thanks.png" alt="" />
+<enhanced:img
+    class="background"
+    fetchpriority="high"
+    src="$lib/assets/thanks.png?w=640;1280;1920;2560"
+    sizes="100vw"
+    alt=""
+/>
 <div class="background2"></div>
 <div class="container2 m-auto flex h-full flex-col">{@render children()}</div>
 

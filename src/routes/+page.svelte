@@ -14,7 +14,11 @@
         "$lib/assets/icons/*.png",
         {
             eager: true, // assuming we're using all the images right away
-            query: "?url"
+            query: {
+                enhanced: true,
+                w: "96;288",
+                effort: "max"
+            }
         }
     );
 
@@ -50,7 +54,8 @@
     }
 
     const { data }: { data: PageData } = $props();
-    let { visitors, buffer } = $derived(data);
+    let { buffer } = $derived(data);
+    let visitors = $state<number | null>(null);
     // $inspect(buffer);
 
     const client = new Pocketbase("https://cdn.zelo.dev");
@@ -119,6 +124,32 @@
 
         let cancelled = false;
         let unsubscribe: (() => void) | undefined;
+        let viewerCountRequest: AbortController | undefined;
+
+        const updateViewerCount = async () => {
+            if (document.visibilityState !== "visible" || viewerCountRequest) return;
+
+            viewerCountRequest = new AbortController();
+
+            try {
+                const response = await fetch("/api/viewers", {
+                    headers: { Accept: "application/json" },
+                    signal: viewerCountRequest.signal
+                });
+                if (!response.ok) return;
+
+                const data = (await response.json()) as { visitors?: unknown };
+                if (typeof data.visitors === "number" && !cancelled) {
+                    visitors = data.visitors;
+                }
+            } catch (error) {
+                if (!(error instanceof DOMException && error.name === "AbortError")) {
+                    console.error("Failed to fetch the viewer count", error);
+                }
+            } finally {
+                viewerCountRequest = undefined;
+            }
+        };
 
         const updateBuffer = (nextBuffer: SocketMessageData["buffer"], animate = true) => {
             // Server has it as Needle but needle is C2, so this is a fix for that goofy typo
@@ -160,10 +191,14 @@
         };
 
         void initialiseCounts();
+        void updateViewerCount();
+        const viewerCountInterval = setInterval(() => void updateViewerCount(), 60_000);
 
         return () => {
             cancelled = true;
             clearInterval(interval);
+            clearInterval(viewerCountInterval);
+            viewerCountRequest?.abort();
             unsubscribe?.();
             currentAudio?.pause();
         };
@@ -279,7 +314,12 @@
                     onclick={() => playContestantSound(contestant.name)}
                 >
                     {#if image}
-                        <enhanced:img src={image} alt={contestant.name} class="h-24" />
+                        <enhanced:img
+                            src={image}
+                            alt={contestant.name}
+                            class="h-24 w-24"
+                            // sizes="96px"
+                        />
                     {/if}
                 </button>
                 <!-- <div
@@ -367,12 +407,13 @@
                 <p>Total Votes: {countsReady ? `${buffer.total.toLocaleString()}*` : "Loading…"}</p>
             </div>
             <div class="text-xs">
-                <!-- <span class=""
-                    >{visitors.toLocaleString()}
-                    {visitors === 1 ? "user" : "users"} watching on bc.zelo.dev</span
-                > -->
-                <!-- what a hack lmao -->
-                <!-- <br /> -->
+                {#if visitors !== null}
+                    <span>
+                        {visitors.toLocaleString()}
+                        {visitors === 1 ? "user" : "users"} watching on bc.zelo.dev
+                    </span>
+                    <br />
+                {/if}
                 {#if countsReady}
                     <div
                         class="mx-1 inline-block h-2 w-2 animate-ping rounded-full bg-green-500"

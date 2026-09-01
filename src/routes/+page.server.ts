@@ -3,7 +3,6 @@ import Pocketbase from "pocketbase";
 import type { SocketMessageData } from "$lib/types";
 
 export async function load() {
-    // const visitors = await getOnlineUsers();
     const client = new Pocketbase("https://cdn.zelo.dev");
     const bc = client.collection<SocketMessageData>("bracketcounter");
 
@@ -12,5 +11,5 @@ export async function load() {
     // Typo fix lol
     buffer.config.contestants["a5"][0] = "Naily";
 
-    return { visitors: 1, buffer };
+    return { buffer };
 }

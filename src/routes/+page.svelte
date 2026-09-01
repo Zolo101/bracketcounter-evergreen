@@ -61,6 +61,7 @@
     // worst hack in the world ??
     /** false = least, true = most */
     let sort = $state(false);
+    let countsReady = $state(false);
     // const barWidth: Record<any, { width: Tween<number>; votes: Tween<number> }> = {
     const barWidth: Record<any, { votes: Tween<number> }> = {};
 
@@ -104,25 +105,6 @@
             .sort((a, b) => a.votes - b.votes)
     );
 
-    let firstTime = true;
-    $effect(() => {
-        for (const contestant of sortedContestants) {
-            if (firstTime) {
-                // barWidth[contestant.id].width.set(
-                //     (contestant.votes / sortedContestants[0].votes) * 100,
-                //     { duration: 0 }
-                // );
-                // barWidth[contestant.id].votes.set(contestant.votes, { duration: 0 });
-            } else {
-                // barWidth[contestant.id].width.set(
-                //     (contestant.votes / sortedContestants[0].votes) * 100
-                // );
-                barWidth[contestant.id].votes.set(contestant.votes);
-            }
-        }
-        firstTime = false;
-    });
-
     let navHeight = $state(0);
 
     let currentDate = $state(new Date());
@@ -138,25 +120,40 @@
         let cancelled = false;
         let unsubscribe: (() => void) | undefined;
 
-        const updateBuffer = (nextBuffer: SocketMessageData["buffer"]) => {
-            buffer = nextBuffer;
-
+        const updateBuffer = (nextBuffer: SocketMessageData["buffer"], animate = true) => {
             // Server has it as Needle but needle is C2, so this is a fix for that goofy typo
-            buffer.config.contestants["a5"][0] = "Naily";
+            nextBuffer.config.contestants["a5"][0] = "Naily";
+
+            for (const [id, votes] of Object.entries(nextBuffer.votes)) {
+                if (!animate || !barWidth[id]) {
+                    barWidth[id] = {
+                        votes: new Tween(votes, { easing: cubicInOut, duration: 2000 })
+                    };
+                } else {
+                    barWidth[id].votes.set(votes);
+                }
+            }
+
+            buffer = nextBuffer;
         };
 
         const initialiseCounts = async () => {
             try {
                 const record = await bc.getOne("c7qpatzs5iizr7n");
-                if (!cancelled) updateBuffer(record.buffer);
+                if (!cancelled) {
+                    updateBuffer(record.buffer, false);
+                    countsReady = true;
+                }
             } catch (error) {
                 console.error("Failed to fetch the latest counts", error);
+                countsReady = true;
             }
 
             if (cancelled) return;
 
             unsubscribe = await bc.subscribe("c7qpatzs5iizr7n", (e) => {
                 updateBuffer(e.record.buffer);
+                countsReady = true;
             });
 
             if (cancelled) unsubscribe();
@@ -366,7 +363,7 @@
         </section> -->
         <section>
             <div class="text-2xl font-bold max-lg:text-4xl">
-                <p>Total Votes: {buffer.total.toLocaleString()}*</p>
+                <p>Total Votes: {countsReady ? `${buffer.total.toLocaleString()}*` : "Loading…"}</p>
             </div>
             <div class="text-xs">
                 <!-- <span class=""
@@ -375,18 +372,22 @@
                 > -->
                 <!-- what a hack lmao -->
                 <!-- <br /> -->
-                <div class="mx-1 inline-block h-2 w-2 animate-ping rounded-full bg-green-500"></div>
-                <div
-                    class="relative right-4.75 mx-1 inline-block h-2 w-2 rounded-full bg-green-500"
-                ></div>
-                <span class="relative right-4.75">Updated {lastUpdated}</span>
+                {#if countsReady}
+                    <div
+                        class="mx-1 inline-block h-2 w-2 animate-ping rounded-full bg-green-500"
+                    ></div>
+                    <div
+                        class="relative right-4.75 mx-1 inline-block h-2 w-2 rounded-full bg-green-500"
+                    ></div>
+                    <span class="relative right-4.75">Updated {lastUpdated}</span>
+                {/if}
             </div>
         </section>
     </div>
 </nav>
 <!-- <main class="mb-10 w-full grow" style="max-height: calc(100vh - {navHeight}px - 150px);"> -->
 <main class="mb-10 w-full grow">
-    <div class={["shabang gap-1"]}>
+    <div class={["shabang gap-1", !countsReady && "invisible"]}>
         {#each sortedContestants as contestant (contestant.id)}
             <!-- <div animate:flip={{ easing: cubicOut }}> -->
             <div>

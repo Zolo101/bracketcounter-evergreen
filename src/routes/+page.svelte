@@ -10,6 +10,11 @@
     import { Tween } from "svelte/motion";
     import QR from "$lib/assets/qr.png";
     import announcer from "$lib/assets/message.webp";
+    import explosionSound from "$lib/assets/explosion.ogg";
+    import { gsap } from "gsap";
+    import { Physics2DPlugin } from "gsap/Physics2DPlugin";
+
+    gsap.registerPlugin(Physics2DPlugin);
 
     const Characters: Record<string, { default: string }> = import.meta.glob(
         "$lib/assets/icons/*.png",
@@ -35,6 +40,12 @@
     let playingContestants = $state<Record<string, number>>({});
     let broadcastMessage = $state("");
     let broadcastExpiresAt = $state(0);
+    const activeExplosions = new Set<{
+        layer: HTMLDivElement;
+        target: HTMLElement;
+        icons: HTMLElement[];
+        timeline: ReturnType<typeof gsap.timeline>;
+    }>();
 
     const BROADCAST_DURATION = 15 * 60 * 1000;
     const BROADCAST_STORAGE_KEY = "bracketcounter-broadcast";
@@ -248,8 +259,263 @@
             viewerCountRequest?.abort();
             unsubscribe?.();
             currentAudio?.pause();
+
+            for (const explosion of activeExplosions) {
+                explosion.timeline.kill();
+                explosion.layer.remove();
+                gsap.set(explosion.target, { clearProps: "filter" });
+                gsap.set(explosion.icons, { clearProps: "transform" });
+            }
+            activeExplosions.clear();
         };
     });
+
+    function disappearThenFadeIn(target: HTMLElement) {
+        gsap.to(target, {
+            opacity: 0,
+            duration: 0
+        }).then(() => {
+            gsap.to(target, {
+                opacity: 1,
+                duration: 5,
+                delay: 5
+            });
+        });
+    }
+
+    function shake(target: HTMLElement) {
+        gsap.to(target, {
+            keyframes: [
+                ...Array.from({ length: 40 }, () => ({
+                    x: gsap.utils.random(-10, 10),
+                    y: gsap.utils.random(-10, 10),
+                    duration: 0.05,
+                    ease: "linear"
+                })),
+                { x: 0, y: 0, duration: 0.1 }
+            ],
+            ease: "linear"
+        });
+    }
+
+    function bounce(target: HTMLElement) {
+        gsap.to(target, {
+            y: "-=20",
+            duration: 0.2,
+            repeat: 5,
+            yoyo: true,
+            ease: "power1.inOut"
+        });
+    }
+
+    function explode(target: HTMLElement) {
+        for (const activeExplosion of activeExplosions) {
+            activeExplosion.timeline.kill();
+            activeExplosion.layer.remove();
+            // gsap.set(activeExplosion.target, { clearProps: "filter" });
+            // gsap.set(activeExplosion.icons, { clearProps: "transform" });
+        }
+        activeExplosions.clear();
+
+        const { left, top, width, height } = target.getBoundingClientRect();
+        const x = left + width / 2;
+        const y = top + height / 2;
+        const layer = document.createElement("div");
+        const flash = document.createElement("div");
+        const icons = Array.from(document.querySelectorAll<HTMLElement>(".cell")).filter((icon) => {
+            const rect = icon.getBoundingClientRect();
+
+            return (
+                !target.contains(icon) &&
+                !icon.contains(target) &&
+                rect.left >= 0 &&
+                rect.right <= window.innerWidth &&
+                rect.top >= -100 &&
+                rect.bottom <= window.innerHeight + 100
+            );
+        });
+
+        layer.className = "bomby-explosion";
+        layer.setAttribute("aria-hidden", "true");
+        flash.className = "bomby-flash";
+        // layer.append(flash);
+
+        document.body.append(layer);
+        // gsap.set(flash, {
+        //     left: x,
+        //     top: y,
+        //     xPercent: -50,
+        //     yPercent: -50
+        // });
+
+        // if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        //     gsap.fromTo(
+        //         flash,
+        //         { scale: 0.3, opacity: 0.95 },
+        //         {
+        //             scale: 2.5,
+        //             opacity: 0,
+        //             duration: 0.18,
+        //             onComplete: () => layer.remove()
+        //         }
+        //     );
+        //     return;
+        // }
+
+        let timeline!: ReturnType<typeof gsap.timeline>;
+        timeline = gsap.timeline({
+            onComplete: () => {
+                layer.remove();
+                gsap.set(target, { clearProps: "filter" });
+                gsap.set(icons, { clearProps: "transform" });
+                activeExplosions.delete(explosion);
+            }
+        });
+        const explosion = { layer, target, icons, timeline };
+        activeExplosions.add(explosion);
+
+        const chargeDuration = 2;
+
+        // How it goes...
+
+        // Charge Up
+        timeline.fromTo(
+            target,
+            { filter: "brightness(1)", transform: "scale(1)" },
+            {
+                filter: "brightness(10)",
+                transform: "scale(1.5)",
+                duration: chargeDuration,
+                ease: "power2.in"
+            },
+            0
+        );
+
+        // hide
+        timeline.add(() => {
+            gsap.set("#b8", { opacity: 0 });
+        });
+
+        // timeline.fromTo(
+        //     flash,
+        //     { scale: 0.2, opacity: 1 },
+        //     { scale: 4.5, opacity: 0, duration: 1, ease: "power3.out" },
+        //     chargeDuration
+        // );
+
+        //
+        // timeline.to(
+        //     target,
+        //     { filter: "brightness(1)", duration: 0.35, ease: "power2.out" },
+        //     chargeDuration
+        // );
+        timeline.call(
+            () => {
+                void new Audio(explosionSound).play().catch(() => undefined);
+            },
+            undefined,
+            chargeDuration
+        );
+
+        const viewportDiagonal = Math.hypot(window.innerWidth, window.innerHeight);
+        const blastDuration = 2;
+        const reflectBetween = (value: number, minimum: number, maximum: number) => {
+            const span = maximum - minimum;
+            if (span <= 0) return (minimum + maximum) / 2;
+
+            const period = span * 2;
+            const wrapped = (((value - minimum) % period) + period) % period;
+            return minimum + (wrapped <= span ? wrapped : period - wrapped);
+        };
+
+        // fade in
+        timeline.add(() => {
+            gsap.to(target, {
+                transform: "",
+                filter: "",
+                duration: 2,
+                delay: blastDuration
+            });
+            gsap.to("#b8", {
+                opacity: 1,
+                duration: 2,
+                delay: blastDuration
+            });
+        });
+
+        for (const icon of icons) {
+            const iconRect = icon.getBoundingClientRect();
+            const dx = iconRect.left + iconRect.width / 2 - x;
+            const dy = iconRect.top + iconRect.height / 2 - y;
+            const distance = Math.hypot(dx, dy);
+            const proximity = 1 - Math.min(distance / viewportDiagonal, 1);
+            const angle = (Math.atan2(dy, dx) * 180) / Math.PI + gsap.utils.random(-20, 20);
+            const minimumX = -iconRect.left;
+            const maximumX = window.innerWidth - iconRect.right;
+            const minimumY = -iconRect.top;
+            const maximumY = window.innerHeight - iconRect.bottom;
+            const setX = gsap.quickSetter(icon, "x", "px");
+            const setY = gsap.quickSetter(icon, "y", "px");
+
+            timeline.to(
+                icon,
+                {
+                    duration: blastDuration,
+                    physics2D: {
+                        angle,
+                        velocity: 500 + proximity * 10 * 360,
+                        // gravity: gsap.utils.random(80, 220),
+                        friction: 0.1
+                    },
+                    onUpdate: () => {
+                        const rawX = Number.parseFloat(String(gsap.getProperty(icon, "x"))) || 0;
+                        const rawY = Number.parseFloat(String(gsap.getProperty(icon, "y"))) || 0;
+
+                        setX(reflectBetween(rawX, minimumX, maximumX - 10));
+                        setY(reflectBetween(rawY, minimumY, maximumY - 10));
+                    }
+                },
+                chargeDuration
+            );
+            timeline.to(
+                icon,
+                {
+                    x: 0,
+                    y: 0,
+                    rotation: 0,
+                    duration: 3,
+                    ease: "elastic.out(0.8, 0.7)"
+                },
+                chargeDuration + blastDuration + gsap.utils.random(0.02, 0.14)
+            );
+        }
+    }
+
+    function rainbow(target: HTMLElement) {
+        gsap.to(target, {
+            filter: "hue-rotate(720deg)",
+            duration: 2,
+            ease: "linear"
+        }).then(() => {
+            gsap.to(target, {
+                filter: "hue-rotate(0deg)",
+                duration: 0
+            });
+        });
+    }
+
+    const animations: Partial<Record<string, (target: HTMLElement) => void>> = {
+        Bomby: explode,
+        "Yellow Face": shake,
+        Bubble: disappearThenFadeIn,
+        Naily: bounce,
+        Puffball: rainbow
+    };
+
+    function handleContestantClick(name: string, event: MouseEvent) {
+        playContestantSound(name);
+        animations[name]?.(event.currentTarget as HTMLElement);
+    }
 </script>
 
 {#snippet info()}
@@ -343,9 +609,9 @@
     {@const sound = Sounds[`/src/lib/assets/sounds/${contestant.name}.ogg`]?.default}
     {@const votes = barWidth[contestant.id].votes.current}
     <!-- {#if votes > 0} -->
-    <div class="h-full w-full grow items-center gap-5">
+    <div class="cell h-full w-full grow items-center gap-5" id={contestant.id}>
         <div
-            class="bar-container flex h-full w-full justify-center gap-5 overflow-hidden rounded-md drop-shadow-xl"
+            class="bar-container flex h-full w-full justify-center gap-5 overflow-visible rounded-md drop-shadow-xl"
         >
             <div
                 class="bar flex h-full flex-col justify-center rounded-md leading-4 drop-shadow-xs"
@@ -353,18 +619,15 @@
                 <!-- style="background-color: {contestant.color};" -->
                 <button
                     type="button"
-                    class={[
-                        "m-auto enabled:cursor-pointer disabled:cursor-default",
-                        playingContestants[contestant.name] > 0 && "animate-spin"
-                    ]}
+                    class={["m-auto enabled:cursor-pointer disabled:cursor-default"]}
                     disabled={!sound}
-                    onclick={() => playContestantSound(contestant.name)}
+                    onclick={(event) => handleContestantClick(contestant.name, event)}
                 >
                     {#if image}
                         <enhanced:img
                             src={image}
                             alt={contestant.name}
-                            class="h-24 w-24"
+                            class="contestant-icon h-24 w-24"
                             // sizes="96px"
                         />
                     {/if}
@@ -494,7 +757,7 @@
                 >
                     {@html broadcastMessage}
                 </aside>
-                <img src={announcer} class="h-14" />
+                <img src={announcer} alt="" class="h-14" />
             </div>
         {/if}
     </div>
@@ -525,7 +788,7 @@
         corner-shape: superellipse(0);
     }
 
-    .toggle-btn {
+    /* .toggle-btn {
         flex: 1;
         padding: 8px 16px;
         margin: 0;
@@ -545,7 +808,7 @@
             background-color: var(--color-secondary);
             color: var(--color-primary);
         }
-    }
+    } */
 
     /* .bar-container,
     .bar {
@@ -566,6 +829,27 @@
         font-size: 2rem;
         line-height: 1;
     }
+
+    :global(.bomby-explosion) {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    /* :global(.bomby-flash) {
+        position: absolute;
+        will-change: transform, opacity;
+    }
+
+    :global(.bomby-flash) {
+        width: 64px;
+        height: 64px;
+        border-radius: 999px;
+        background: radial-gradient(circle, white 0 12%, #ffe970 26%, #ff7417 53%, transparent 72%);
+        filter: drop-shadow(0 0 20px #ff9d19);
+    } */
 
     /* @media (height < 60rem) {
         .bar-container {

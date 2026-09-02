@@ -492,7 +492,7 @@
                     role="status"
                     aria-live="polite"
                 >
-                    {@html broadcastMessage} huirdtguihn grdnuihdbvi nhurvgbndhudg urvb hrgggdrdgfin
+                    {@html broadcastMessage}
                 </aside>
                 <img src={announcer} class="h-14" />
             </div>

@@ -30,6 +30,11 @@ export type Status = {
     done: boolean;
 };
 
+/** Temp stuff i can add in */
+export type Meta = {
+    message: string;
+};
+
 export type SocketMessageData = {
     id: string;
     title: string;
@@ -42,5 +47,6 @@ export type SocketMessageData = {
         config: Config;
         votes: Votes;
         total: number;
+        meta?: Meta;
     };
 };

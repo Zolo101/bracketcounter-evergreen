@@ -1,8 +1,57 @@
 <script lang="ts">
     import "./layout.css";
 
+    import { onMount } from "svelte";
     import favicon from "$lib/assets/favicon.png";
     import embedImage from "$lib/assets/embed.png";
+
+    const VERSION_CHECK_INTERVAL = 60_000;
+
+    onMount(() => {
+        if (!import.meta.env.PROD) return;
+
+        let stopped = false;
+        let reloading = false;
+
+        const checkForNewDeployment = async () => {
+            if (stopped || reloading) return;
+
+            try {
+                const response = await fetch(`/version.json?t=${Date.now()}`, {
+                    cache: "no-store",
+                    headers: { Accept: "application/json" }
+                });
+
+                if (!response.ok) return;
+
+                const deployment = (await response.json()) as { version?: unknown };
+                if (
+                    typeof deployment.version === "string" &&
+                    deployment.version !== __BUILD_VERSION__
+                ) {
+                    reloading = true;
+                    window.location.reload();
+                }
+            } catch {
+                // A temporary network failure should not interrupt the app.
+            }
+        };
+
+        const interval = window.setInterval(checkForNewDeployment, VERSION_CHECK_INTERVAL);
+        const checkWhenVisible = () => {
+            if (document.visibilityState === "visible") void checkForNewDeployment();
+        };
+
+        document.addEventListener("visibilitychange", checkWhenVisible);
+        void checkForNewDeployment();
+
+        return () => {
+            stopped = true;
+            window.clearInterval(interval);
+            document.removeEventListener("visibilitychange", checkWhenVisible);
+        };
+    });
+
     let { children } = $props();
 </script>
 

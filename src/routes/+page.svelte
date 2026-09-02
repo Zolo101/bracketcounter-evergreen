@@ -9,6 +9,7 @@
     import { cubicIn, cubicInOut, cubicOut } from "svelte/easing";
     import { Tween } from "svelte/motion";
     import QR from "$lib/assets/qr.png";
+    import announcer from "$lib/assets/message.webp";
 
     const Characters: Record<string, { default: string }> = import.meta.glob(
         "$lib/assets/icons/*.png",
@@ -32,6 +33,11 @@
 
     let currentAudio: HTMLAudioElement | undefined;
     let playingContestants = $state<Record<string, number>>({});
+    let broadcastMessage = $state("");
+    let broadcastExpiresAt = $state(0);
+
+    const BROADCAST_DURATION = 15 * 60 * 1000;
+    const BROADCAST_STORAGE_KEY = "bracketcounter-broadcast";
 
     function playContestantSound(name: string) {
         const sound = Sounds[`/src/lib/assets/sounds/${name}.ogg`]?.default;
@@ -113,6 +119,13 @@
     let navHeight = $state(0);
 
     let currentDate = $state(new Date());
+    const dataIsStale = $derived(
+        currentDate.getTime() - new Date(buffer.status.updateDate).getTime() > 120_000
+        // currentDate.getTime() - new Date(buffer.status.updateDate).getTime() > 100
+    );
+    const showBroadcast = $derived(
+        broadcastMessage.length > 0 && currentDate.getTime() < broadcastExpiresAt
+    );
     const lastUpdated = $derived(
         formatRelativeTimeLong(new Date(buffer.status.updateDate), currentDate)
     );
@@ -125,6 +138,38 @@
         let cancelled = false;
         let unsubscribe: (() => void) | undefined;
         let viewerCountRequest: AbortController | undefined;
+
+        try {
+            const storedBroadcast = JSON.parse(
+                sessionStorage.getItem(BROADCAST_STORAGE_KEY) ?? "null"
+            ) as { message?: unknown; expiresAt?: unknown } | null;
+
+            if (
+                typeof storedBroadcast?.message === "string" &&
+                typeof storedBroadcast.expiresAt === "number" &&
+                storedBroadcast.expiresAt > Date.now()
+            ) {
+                broadcastMessage = storedBroadcast.message;
+                broadcastExpiresAt = storedBroadcast.expiresAt;
+            } else {
+                sessionStorage.removeItem(BROADCAST_STORAGE_KEY);
+            }
+        } catch {
+            sessionStorage.removeItem(BROADCAST_STORAGE_KEY);
+        }
+
+        const handleMeta = (record: SocketMessageData) => {
+            const message = record.buffer.meta?.message?.trim();
+
+            if (message) {
+                broadcastMessage = message;
+                broadcastExpiresAt = Date.now() + BROADCAST_DURATION;
+                sessionStorage.setItem(
+                    BROADCAST_STORAGE_KEY,
+                    JSON.stringify({ message: broadcastMessage, expiresAt: broadcastExpiresAt })
+                );
+            }
+        };
 
         const updateViewerCount = async () => {
             if (document.visibilityState !== "visible" || viewerCountRequest) return;
@@ -172,6 +217,7 @@
             try {
                 const record = await bc.getOne("fq6gqvwz3mjqeza");
                 if (!cancelled) {
+                    handleMeta(record);
                     updateBuffer(record.buffer, false);
                     countsReady = true;
                 }
@@ -183,6 +229,7 @@
             if (cancelled) return;
 
             unsubscribe = await bc.subscribe("fq6gqvwz3mjqeza", (e) => {
+                handleMeta(e.record);
                 updateBuffer(e.record.buffer);
                 countsReady = true;
             });
@@ -391,7 +438,7 @@
             {@render info()}
         </section>
     </section>
-    <div class="mb-5 flex items-center gap-2 max-sm:flex-col-reverse">
+    <div class="mb-5 flex items-center justify-between gap-2 max-sm:flex-col-reverse">
         <!-- <section class="w-50">
             <div class="flex overflow-hidden rounded ring-2 ring-secondary">
                 <button class="toggle-btn" class:active={!sort} onclick={() => (sort = false)}>
@@ -406,6 +453,7 @@
             <div class="text-2xl font-bold max-lg:text-4xl">
                 <p>Total Votes: {countsReady ? `${buffer.total.toLocaleString()}*` : "Loading…"}</p>
             </div>
+
             <div class="text-xs">
                 {#if visitors !== null}
                     <span>
@@ -416,15 +464,39 @@
                 {/if}
                 {#if countsReady}
                     <div
-                        class="mx-1 inline-block h-2 w-2 animate-ping rounded-full bg-green-500"
+                        class={[
+                            "mx-1 inline-block h-2 w-2 animate-ping rounded-full",
+                            dataIsStale ? "bg-orange-500" : "bg-green-500"
+                        ]}
                     ></div>
                     <div
-                        class="relative right-4.75 mx-1 inline-block h-2 w-2 rounded-full bg-green-500"
+                        class={[
+                            "relative right-4.75 mx-1 inline-block h-2 w-2 rounded-full",
+                            dataIsStale ? "bg-orange-500" : "bg-green-500"
+                        ]}
                     ></div>
-                    <span class="relative right-4.75">Updated {lastUpdated}</span>
+                    <span class="relative right-4.75" aria-live="polite">
+                        {#if dataIsStale}
+                            Counts may be outdated... please refresh your browser! Updated {lastUpdated}
+                        {:else}
+                            Updated {lastUpdated}
+                        {/if}
+                    </span>
                 {/if}
             </div>
         </section>
+        {#if showBroadcast}
+            <div class="flex items-center gap-2">
+                <aside
+                    class="broadcast rounded-r-full bg-blue-800 py-3 pr-6 pl-3 text-2xl font-bold wrap-normal"
+                    role="status"
+                    aria-live="polite"
+                >
+                    {@html broadcastMessage} huirdtguihn grdnuihdbvi nhurvgbndhudg urvb hrgggdrdgfin
+                </aside>
+                <img src={announcer} class="h-14" />
+            </div>
+        {/if}
     </div>
 </nav>
 <!-- <main class="mb-10 w-full grow" style="max-height: calc(100vh - {navHeight}px - 150px);"> -->
@@ -447,6 +519,10 @@
         grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
         flex-direction: column;
         gap: 1rem;
+    }
+
+    .broadcast {
+        corner-shape: superellipse(0);
     }
 
     .toggle-btn {

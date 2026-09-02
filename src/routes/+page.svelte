@@ -271,15 +271,13 @@
     });
 
     function disappearThenFadeIn(target: HTMLElement) {
+        gsap.killTweensOf(target, "opacity");
+        gsap.set(target, { opacity: 0 });
         gsap.to(target, {
-            opacity: 0,
-            duration: 0
-        }).then(() => {
-            gsap.to(target, {
-                opacity: 1,
-                duration: 5,
-                delay: 5
-            });
+            opacity: 1,
+            duration: 5,
+            delay: 5,
+            ease: "power1.inOut"
         });
     }
 

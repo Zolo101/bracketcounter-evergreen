@@ -198,7 +198,7 @@
 
         const updateBuffer = (nextBuffer: SocketMessageData["buffer"], animate = true) => {
             // Server has it as Needle but needle is C2, so this is a fix for that goofy typo
-            nextBuffer.config.contestants["a5"][0] = "Naily";
+            // nextBuffer.config.contestants["a5"][0] = "Naily";
 
             for (const [id, votes] of Object.entries(nextBuffer.votes)) {
                 if (!animate || !barWidth[id]) {
@@ -215,7 +215,7 @@
 
         const initialiseCounts = async () => {
             try {
-                const record = await bc.getOne("fq6gqvwz3mjqeza");
+                const record = await bc.getOne("3vblfor8xkof2i0");
                 if (!cancelled) {
                     handleMeta(record);
                     updateBuffer(record.buffer, false);
@@ -228,7 +228,7 @@
 
             if (cancelled) return;
 
-            unsubscribe = await bc.subscribe("fq6gqvwz3mjqeza", (e) => {
+            unsubscribe = await bc.subscribe("3vblfor8xkof2i0", (e) => {
                 handleMeta(e.record);
                 updateBuffer(e.record.buffer);
                 countsReady = true;

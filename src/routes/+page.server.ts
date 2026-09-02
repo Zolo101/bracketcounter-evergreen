@@ -6,10 +6,10 @@ export async function load() {
     const client = new Pocketbase("https://cdn.zelo.dev");
     const bc = client.collection<SocketMessageData>("bracketcounter");
 
-    const { buffer } = await bc.getOne("fq6gqvwz3mjqeza");
+    const { buffer } = await bc.getOne("3vblfor8xkof2i0");
 
     // Typo fix lol
-    buffer.config.contestants["a5"][0] = "Naily";
+    // buffer.config.contestants["a5"][0] = "Naily";
 
     return { buffer };
 }

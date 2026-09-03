@@ -2,8 +2,10 @@
     import "./layout.css";
 
     import { onMount } from "svelte";
-    import favicon from "$lib/assets/favicon.png";
     import embedImage from "$lib/assets/embed.png";
+
+    const siteUrl = "https://bc.zelo.dev/";
+    const embedImageUrl = new URL(embedImage, siteUrl).href;
 
     const VERSION_CHECK_INTERVAL = 60_000;
 
@@ -56,7 +58,7 @@
 </script>
 
 <svelte:head>
-    <link rel="icon" href={favicon} />
+    <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192" />
     <title>TPOT Vote Tracker - bracketcounter</title>
     <meta
         name="description"
@@ -73,15 +75,20 @@
         content="Live vote tracker for BFDI: The Power of Two (TPOT). See real-time elimination vote counts and rankings for rejoining contestants."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://bc.zelo.dev" />
-    <meta property="og:image" content={embedImage} />
+    <meta property="og:url" content={siteUrl} />
+    <meta property="og:image" content={embedImageUrl} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="800" />
+    <meta property="og:image:height" content="600" />
+    <meta property="og:image:alt" content="TPOT Vote Tracker by bracketcounter" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="TPOT Vote Tracker - bracketcounter" />
     <meta
         name="twitter:description"
         content="Live vote tracker for BFDI: The Power of Two (TPOT). See real-time elimination vote counts and rankings for rejoining contestants."
     />
-    <meta name="twitter:image" content={embedImage} />
+    <meta name="twitter:image" content={embedImageUrl} />
+    <meta name="twitter:image:alt" content="TPOT Vote Tracker by bracketcounter" />
     <script
         defer
         src="https://analytics.zelo.dev/script.js"

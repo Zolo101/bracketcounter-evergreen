@@ -544,62 +544,6 @@
     </div>
 {/snippet}
 
-{#snippet bar(contestant: Contestant)}
-    {@const nameColor = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
-    {@const color = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
-    {@const image = Characters[`/src/lib/assets/characters/${contestant.name}.webp`].default}
-    {@const votes = barWidth[contestant.id].votes.current}
-    {@const width = barWidth[contestant.id].width.current}
-    {#if votes > 0}
-        <div class="w-full grow items-center gap-5">
-            <div
-                class="bar-container flex h-15 items-center gap-5 overflow-hidden rounded-md drop-shadow-xl"
-            >
-                <div
-                    class="bar flex h-full items-center rounded-md px-3 leading-4 drop-shadow-xs"
-                    style="width: {width}%; background-color: {contestant.color};"
-                >
-                    <div
-                        class="title relative flex items-baseline gap-2 self-center brightness-175 contrast-125"
-                        style="color: {nameColor};"
-                    >
-                        {#if contestant.id && buffer.votes[contestant.id] > 0}
-                            <span class="id absolute -left-2 font-mono text-xs font-bold sm:top-3">
-                                {contestant.id.toUpperCase()}
-                            </span>
-                        {/if}
-                        <span class="name mx-2 font-bold wrap-anywhere text-shadow-sm">
-                            {contestant.name}
-                        </span>
-                    </div>
-                    <div class="percentage ml-auto flex h-10 items-center">
-                        <enhanced:img
-                            src={image}
-                            alt=""
-                            class="relative h-10 scale-200 -rotate-15 self-end mask-r-from-40% mask-r-to-80% object-cover object-center"
-                        />
-                        {#if sort}
-                            <span
-                                class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
-                                style="color: {color};"
-                            >
-                                {votes.toFixed(0)}
-                            </span>
-                        {:else}
-                            <span
-                                class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-sm:text-shadow-md sm:text-2xl"
-                                style="color: {color};"
-                            >
-                                {votes.toFixed(0)} ({contestant.percentage.toFixed(1)}%)
-                            </span>
-                        {/if}
-                    </div>
-                </div>
-            </div>
-        </div>
-    {/if}
-{/snippet}
-
 {#snippet cell(contestant: Contestant)}
     {@const nameColor = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
     {@const color = "color-mix(in oklab, " + contestant.color + " 100%, white)"}
@@ -607,9 +551,9 @@
     {@const sound = Sounds[`/src/lib/assets/sounds/${contestant.name}.ogg`]?.default}
     {@const votes = barWidth[contestant.id].votes.current}
     <!-- {#if votes > 0} -->
-    <div class="cell h-full w-full grow items-center gap-5" id={contestant.id}>
+    <div class="cell h-full w-full grow items-center" id={contestant.id}>
         <div
-            class="bar-container flex h-full w-full justify-center gap-5 overflow-visible rounded-md drop-shadow-xl"
+            class="bar-container flex h-full w-full justify-center overflow-visible rounded-md drop-shadow-xl"
         >
             <div
                 class="bar flex h-full flex-col justify-center rounded-md leading-4 drop-shadow-xs"
@@ -626,6 +570,7 @@
                             src={image}
                             alt={contestant.name}
                             class="contestant-icon h-24 w-24"
+                            // class="contestant-icon h-24 w-24 max-sm:h-20 max-sm:w-20"
                             // sizes="96px"
                         />
                     {/if}
@@ -647,9 +592,9 @@
                     </span>
                 </div>
 
-                <div class="percentage flex h-10 items-center justify-center max-lg:text-sm!">
+                <div class="percentage flex h-10 items-center justify-center max-lg:text-sm">
                     <span
-                        class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-lg:text-4xl max-sm:text-shadow-md"
+                        class="flex font-bold tabular-nums brightness-150 text-shadow-sm max-lg:text-2xl max-sm:text-shadow-md"
                     >
                         <!-- style="color: {color};" -->
                         {Math.floor(votes).toLocaleString()}
@@ -710,8 +655,8 @@
                 </button>
             </div>
         </section> -->
-        <section>
-            <div class="text-2xl font-bold max-lg:text-4xl">
+        <section class="vote-summary">
+            <div class="total-votes text-2xl font-bold max-lg:text-4xl">
                 <p>Total Votes: {countsReady ? `${buffer.total.toLocaleString()}*` : "Loading…"}</p>
             </div>
 
@@ -762,7 +707,7 @@
 </nav>
 <!-- <main class="mb-10 w-full grow" style="max-height: calc(100vh - {navHeight}px - 150px);"> -->
 <main class="mb-10 w-full grow">
-    <div class={["shabang gap-1", !countsReady && "invisible"]}>
+    <div class={["shabang", !countsReady && "invisible"]}>
         {#each sortedContestants as contestant (contestant.id)}
             <!-- <div animate:flip={{ easing: cubicOut }}> -->
             <div>
@@ -780,6 +725,29 @@
         grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
         flex-direction: column;
         gap: 1rem;
+    }
+
+    @media (width < 540px) {
+        .shabang {
+            grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+            gap: 0;
+        }
+    }
+
+    @media (width < 40rem) {
+        .vote-summary {
+            width: 100%;
+        }
+
+        .total-votes {
+            container-type: inline-size;
+        }
+
+        .total-votes p {
+            font-size: 9.75cqi;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
     }
 
     .broadcast {

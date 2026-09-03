@@ -134,7 +134,9 @@
         z-index: 1;
         width: 100%;
         @media (width >= 0rem /* 768px */) {
-            padding: 0 1rem;
+            :global(nav) {
+                padding: 0 1rem;
+            }
         }
         @media (width >= 64rem /* 1024px */) {
             max-width: 64rem /* 1024px */;

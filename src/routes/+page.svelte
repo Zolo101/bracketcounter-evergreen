@@ -12,6 +12,8 @@
     import QR from "$lib/assets/qr.png";
     import announcer from "$lib/assets/message.webp";
     import explosionSound from "$lib/assets/explosion.ogg";
+    import nickelPlush from "$lib/assets/misc/nickel_plush.webp";
+    import fiveNickelPlushies from "$lib/assets/misc/Nickel.ogg";
     import { gsap } from "gsap";
     import { Physics2DPlugin } from "gsap/Physics2DPlugin";
 
@@ -45,6 +47,10 @@
         layer: HTMLDivElement;
         target: HTMLElement;
         icons: HTMLElement[];
+        timeline: ReturnType<typeof gsap.timeline>;
+    }>();
+    const activeNickels = new Set<{
+        element: HTMLImageElement;
         timeline: ReturnType<typeof gsap.timeline>;
     }>();
 
@@ -268,6 +274,12 @@
                 gsap.set(explosion.icons, { clearProps: "transform" });
             }
             activeExplosions.clear();
+
+            for (const nickel of activeNickels) {
+                nickel.timeline.kill();
+                nickel.element.remove();
+            }
+            activeNickels.clear();
         };
     });
 
@@ -307,12 +319,21 @@
         });
     }
 
+    function reflectBetween(value: number, minimum: number, maximum: number) {
+        const span = maximum - minimum;
+        if (span <= 0) return (minimum + maximum) / 2;
+
+        const period = span * 2;
+        const wrapped = (((value - minimum) % period) + period) % period;
+        return minimum + (wrapped <= span ? wrapped : period - wrapped);
+    }
+
     function explode(target: HTMLElement) {
         for (const activeExplosion of activeExplosions) {
             activeExplosion.timeline.kill();
             activeExplosion.layer.remove();
-            // gsap.set(activeExplosion.target, { clearProps: "filter" });
-            // gsap.set(activeExplosion.icons, { clearProps: "transform" });
+            gsap.set(activeExplosion.target, { clearProps: "filter" });
+            gsap.set(activeExplosion.icons, { clearProps: "transform" });
         }
         activeExplosions.clear();
 
@@ -320,7 +341,6 @@
         const x = left + width / 2;
         const y = top + height / 2;
         const layer = document.createElement("div");
-        const flash = document.createElement("div");
         const icons = Array.from(document.querySelectorAll<HTMLElement>(".cell")).filter((icon) => {
             const rect = icon.getBoundingClientRect();
 
@@ -336,30 +356,7 @@
 
         layer.className = "bomby-explosion";
         layer.setAttribute("aria-hidden", "true");
-        flash.className = "bomby-flash";
-        // layer.append(flash);
-
         document.body.append(layer);
-        // gsap.set(flash, {
-        //     left: x,
-        //     top: y,
-        //     xPercent: -50,
-        //     yPercent: -50
-        // });
-
-        // if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        //     gsap.fromTo(
-        //         flash,
-        //         { scale: 0.3, opacity: 0.95 },
-        //         {
-        //             scale: 2.5,
-        //             opacity: 0,
-        //             duration: 0.18,
-        //             onComplete: () => layer.remove()
-        //         }
-        //     );
-        //     return;
-        // }
 
         let timeline!: ReturnType<typeof gsap.timeline>;
         timeline = gsap.timeline({
@@ -373,7 +370,7 @@
         const explosion = { layer, target, icons, timeline };
         activeExplosions.add(explosion);
 
-        const chargeDuration = 2;
+        const chargeDuration = 1.8;
 
         // How it goes...
 
@@ -382,32 +379,14 @@
             target,
             { filter: "brightness(1)", transform: "scale(1)" },
             {
-                filter: "brightness(10)",
-                transform: "scale(1.5)",
+                filter: "brightness(5)",
+                transform: "scale(3)",
                 duration: chargeDuration,
-                ease: "power2.in"
+                ease: "expo.in"
             },
             0
         );
 
-        // hide
-        timeline.add(() => {
-            gsap.set("#b8", { opacity: 0 });
-        });
-
-        // timeline.fromTo(
-        //     flash,
-        //     { scale: 0.2, opacity: 1 },
-        //     { scale: 4.5, opacity: 0, duration: 1, ease: "power3.out" },
-        //     chargeDuration
-        // );
-
-        //
-        // timeline.to(
-        //     target,
-        //     { filter: "brightness(1)", duration: 0.35, ease: "power2.out" },
-        //     chargeDuration
-        // );
         timeline.call(
             () => {
                 void new Audio(explosionSound).play().catch(() => undefined);
@@ -416,16 +395,13 @@
             chargeDuration
         );
 
+        // hide
+        timeline.add(() => {
+            gsap.set("#b8", { opacity: 0 });
+        });
+
         const viewportDiagonal = Math.hypot(window.innerWidth, window.innerHeight);
         const blastDuration = 2;
-        const reflectBetween = (value: number, minimum: number, maximum: number) => {
-            const span = maximum - minimum;
-            if (span <= 0) return (minimum + maximum) / 2;
-
-            const period = span * 2;
-            const wrapped = (((value - minimum) % period) + period) % period;
-            return minimum + (wrapped <= span ? wrapped : period - wrapped);
-        };
 
         // fade in
         timeline.add(() => {
@@ -503,12 +479,86 @@
         });
     }
 
+    let presses = 0;
+    function nickel(_target: HTMLElement) {
+        presses++;
+        if (presses < 5) return;
+
+        const lifetime = 10;
+
+        new Audio(fiveNickelPlushies).play().catch(() => undefined);
+
+        for (let i = 0; i < 5; i++) {
+            const nickelIcon = document.createElement("img");
+            const width = Math.min(196, Math.max(52, window.innerWidth * 0.32));
+            const height = width * (443 / 356);
+            // const x = ((i + 0.5) / 5) * window.innerWidth - width / 2;
+
+            nickelIcon.className = "nickel-icon";
+            nickelIcon.src = nickelPlush;
+            nickelIcon.alt = "";
+            nickelIcon.setAttribute("aria-hidden", "true");
+            nickelIcon.draggable = false;
+            nickelIcon.style.width = `${width}px`;
+            nickelIcon.style.height = `${height}px`;
+            nickelIcon.style.top = `${-height}px`;
+            document.body.append(nickelIcon);
+
+            const setX = gsap.quickSetter(nickelIcon, "x", "px");
+            const setY = gsap.quickSetter(nickelIcon, "y", "px");
+            const timeline = gsap.timeline({
+                // delay: i * 0.12,
+                onComplete: () => {
+                    nickelIcon.remove();
+                    activeNickels.delete(animation);
+                }
+            });
+            const animation = { element: nickelIcon, timeline };
+            activeNickels.add(animation);
+
+            gsap.set(nickelIcon, {
+                x: gsap.utils.random(0, window.innerWidth),
+                y: gsap.utils.random(0, window.innerHeight),
+                rotation: gsap.utils.random(-25, 25)
+            });
+            timeline.to(
+                nickelIcon,
+                {
+                    duration: lifetime,
+                    rotation: `+=${gsap.utils.random(-1_080, 1_080) * 3}`,
+                    // ease: "expo.in",
+                    physics2D: {
+                        // angle: gsap.utils.random(65, 115),
+                        angle: gsap.utils.random(0, 360),
+                        velocity: gsap.utils.random(2, 6) * width
+                    },
+                    onUpdate: () => {
+                        const rawX =
+                            Number.parseFloat(String(gsap.getProperty(nickelIcon, "x"))) || 0;
+                        const rawY =
+                            Number.parseFloat(String(gsap.getProperty(nickelIcon, "y"))) || 0;
+                        const maximumX = Math.max(0, window.innerWidth - width);
+                        const maximumY = Math.max(0, window.innerHeight);
+
+                        setX(reflectBetween(rawX, 0, maximumX - 10));
+                        setY(reflectBetween(rawY, height, maximumY));
+                    }
+                },
+                0
+            );
+            timeline.to(nickelIcon, { opacity: 0, duration: 1, ease: "power1.in" }, lifetime - 1);
+        }
+
+        presses = 0;
+    }
+
     const animations: Partial<Record<string, (target: HTMLElement) => void>> = {
         Bomby: explode,
         "Yellow Face": shake,
         Bubble: disappearThenFadeIn,
         Naily: bounce,
-        Puffball: rainbow
+        Puffball: rainbow,
+        Nickel: nickel
     };
 
     function handleContestantClick(name: string, event: MouseEvent) {
@@ -563,7 +613,7 @@
                 <button
                     type="button"
                     class={["m-auto enabled:cursor-pointer disabled:cursor-default"]}
-                    disabled={!sound}
+                    disabled={!sound && !animations[contestant.name]}
                     onclick={(event) => handleContestantClick(contestant.name, event)}
                 >
                     {#if image}
@@ -820,6 +870,18 @@
         z-index: 100;
         overflow: hidden;
         pointer-events: none;
+    }
+
+    :global(.nickel-icon) {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 110;
+        object-fit: contain;
+        pointer-events: none;
+        user-select: none;
+        will-change: transform, opacity;
+        filter: drop-shadow(0 8px 8px rgb(0 0 0 / 0.35));
     }
 
     /* :global(.bomby-flash) {

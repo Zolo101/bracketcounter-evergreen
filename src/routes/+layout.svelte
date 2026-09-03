@@ -3,6 +3,7 @@
 
     import { onMount } from "svelte";
     import embedImage from "$lib/assets/embed.png";
+    import appIcon from "$lib/assets/app.png";
 
     const siteUrl = "https://bc.zelo.dev/";
     const embedImageUrl = new URL(embedImage, siteUrl).href;
@@ -59,6 +60,7 @@
 
 <svelte:head>
     <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192" />
+    <link rel="apple-touch-icon" href={appIcon} />
     <title>TPOT Vote Tracker - bracketcounter</title>
     <meta
         name="description"

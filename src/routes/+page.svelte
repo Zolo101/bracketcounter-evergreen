@@ -1,7 +1,8 @@
 <script lang="ts">
     import type { SocketMessageData } from "$lib/types";
     import Pocketbase from "pocketbase";
-    import BCLOGO from "$lib/assets/bc_blurple.svg?component";
+    import BCLOGO from "$lib/assets/bracketcounter.svg?component";
+    import BCLOGO_LONG from "$lib/assets/bracketcounter_long.svg?component";
     import { formatRelativeTimeLong } from "$lib";
     import { onMount } from "svelte";
     import type { PageData } from "./$types";
@@ -607,14 +608,19 @@
     <!-- {/if} -->
 {/snippet}
 
-<nav class="bg- flex flex-col gap-2 text-white" bind:clientHeight={navHeight}>
+<div class="mobile-logo sm:hidden">
+    <BCLOGO_LONG />
+</div>
+<nav class="flex flex-col gap-2 text-white" bind:clientHeight={navHeight}>
     <section class="flex items-center justify-between gap-2 max-sm:flex-col">
         <div class="text-xs">
             <div
-                class="flex items-center justify-center gap-10 text-lg max-sm:flex-col max-sm:gap-1 max-sm:text-sm"
+                class="flex items-center justify-center gap-2 text-lg max-lg:flex-col max-lg:pt-2 max-sm:gap-1 max-sm:text-sm lg:gap-10"
             >
-                <div class="flex items-center gap-10">
-                    <BCLOGO width="96" height="96" />
+                <div class="flex items-center gap-10 max-sm:w-full max-sm:flex-col max-sm:gap-1">
+                    <div class="max-sm:hidden">
+                        <BCLOGO width={548 / 2} height={137 / 2} />
+                    </div>
                     <div class="font-bold sm:hidden">
                         {@render info()}
                     </div>
@@ -735,6 +741,18 @@
     }
 
     @media (width < 40rem) {
+        .mobile-logo {
+            width: 95%;
+            margin: auto;
+            padding-top: 5px;
+        }
+
+        .mobile-logo :global(svg) {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
         .vote-summary {
             width: 100%;
         }

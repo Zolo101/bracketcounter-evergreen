@@ -565,19 +565,21 @@
         playContestantSound(name);
         animations[name]?.(event.currentTarget as HTMLElement);
     }
+
+    const padStart = (t: number) => t.toString().padStart(2, "0");
+
+    const deadlineDate = $derived(new Date(buffer.status.deadline));
+    const deadline = $derived(new Date(deadlineDate.getTime() - currentDate.getTime()));
 </script>
 
 {#snippet info()}
     <div class="py-5">
-        <section class="text-xl">
-            <span
-                >{new Date(buffer.status.deadline)
-                    .toLocaleDateString(undefined, {
-                        month: "long",
-                        day: "numeric"
-                    })
-                    .toUpperCase()}</span
-            >
+        <section class="text-center text-6xl max-xl:text-5xl max-lg:text-4xl max-sm:text-6xl">
+            <span>{padStart(deadline.getHours() - 1)}</span>
+            <span>:</span>
+            <span>{padStart(deadline.getMinutes())}</span>
+            <span>:</span>
+            <span>{padStart(deadline.getSeconds())}</span>
         </section>
         <section class="max-sm:hidden">
             <span
@@ -687,7 +689,7 @@
                         votes will rejoin.
                     </p>
                     <!-- (according to <em class="text-green-400">Two...</em>) -->
-                    <p class="font-bold text-blue-100">
+                    <p class="text-2xl font-bold text-blue-100">
                         *We cannot count the <a
                             target="_blank"
                             href="https://forms.gle/m9VrLxqktU5KX7GW8">google form</a
@@ -713,7 +715,9 @@
         </section> -->
         <section class="vote-summary">
             <div class="total-votes text-2xl font-bold max-lg:text-4xl">
-                <p>Total Votes: {countsReady ? `${buffer.total.toLocaleString()}*` : "Loading…"}</p>
+                <p>
+                    Total Votes: {countsReady ? `${buffer.total.toLocaleString()}*` : "Loading…"}
+                </p>
             </div>
 
             <div class="text-xs">

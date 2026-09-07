@@ -578,7 +578,7 @@
 
 {#snippet info()}
     <div class="py-5">
-        <section
+        <!-- <section
             class="countdown text-center text-6xl max-xl:text-5xl max-lg:text-4xl max-sm:text-6xl"
             class:countdown-expired={remainingSeconds === 0}
         >
@@ -587,17 +587,17 @@
             <span>{padStart(deadlineMinutes)}</span>
             <span>:</span>
             <span>{padStart(deadlineSeconds)}</span>
-        </section>
+        </section> -->
         <section class="max-sm:hidden">
-            <span
+            <!-- <span
                 ><abbr title="Count from the beginning to catch any vote changes / deletions"
-                    >RECOUNTS</abbr
-                > EVERY</span
-            >
-            <span>{buffer.config.longRefreshTime / 3600} HOURS</span>
+                    >RECOUNT</abbr
+                > NOW</span
+            > -->
+            <!-- <span>{buffer.config.longRefreshTime / 3600} HOURS</span> -->
         </section>
         <section class="flex items-center gap-2 italic max-sm:hidden">
-            <span class="font-normal">View the counts live on <strong>bc.zelo.dev</strong></span>
+            <span class="font-normal">View the results on <strong>bc.zelo.dev</strong></span>
             <img src={QR} alt="QR Code for bc.zelo.dev" class="w-16 invert" />
         </section>
         <p class="text-xs"></p>
@@ -735,7 +735,7 @@
                     </span>
                     <br />
                 {/if}
-                {#if countsReady}
+                <!-- {#if countsReady}
                     <div
                         class={[
                             "mx-1 inline-block h-2 w-2 animate-ping rounded-full",
@@ -755,7 +755,7 @@
                             Updated {lastUpdated}
                         {/if}
                     </span>
-                {/if}
+                {/if} -->
             </div>
         </section>
         {#if showBroadcast}

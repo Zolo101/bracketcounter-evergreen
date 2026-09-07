@@ -578,7 +578,10 @@
 
 {#snippet info()}
     <div class="py-5">
-        <section class="text-center text-6xl max-xl:text-5xl max-lg:text-4xl max-sm:text-6xl">
+        <section
+            class="countdown text-center text-6xl max-xl:text-5xl max-lg:text-4xl max-sm:text-6xl"
+            class:countdown-expired={remainingSeconds === 0}
+        >
             <span>{padStart(deadlineHours)}</span>
             <span>:</span>
             <span>{padStart(deadlineMinutes)}</span>
@@ -783,6 +786,23 @@
 </main>
 
 <style>
+    .countdown-expired {
+        color: #ef4444;
+        animation: countdown-flash 1s steps(1, end) infinite;
+    }
+
+    @keyframes countdown-flash {
+        50% {
+            color: inherit;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .countdown-expired {
+            animation: none;
+        }
+    }
+
     /* the whole shabang */
     .shabang {
         display: grid;

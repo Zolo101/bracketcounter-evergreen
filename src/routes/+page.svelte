@@ -233,7 +233,7 @@
 
         const initialiseCounts = async () => {
             try {
-                const record = await bc.getOne("3vblfor8xkof2i0");
+                const record = await bc.getOne("z9p5hpg808n7ovw");
                 if (!cancelled) {
                     handleMeta(record);
                     updateBuffer(record.buffer, false);
@@ -246,7 +246,7 @@
 
             if (cancelled) return;
 
-            unsubscribe = await bc.subscribe("3vblfor8xkof2i0", (e) => {
+            unsubscribe = await bc.subscribe("z9p5hpg808n7ovw", (e) => {
                 handleMeta(e.record);
                 updateBuffer(e.record.buffer);
                 countsReady = true;

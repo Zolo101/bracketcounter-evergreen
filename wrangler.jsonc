@@ -22,6 +22,6 @@
         "required": ["UMAMI_USERNAME", "UMAMI_PASSWORD"]
     },
     "triggers": {
-        "crons": ["*/15 * * * *"]
+        "crons": ["*/5 * * * *"]
     }
 }

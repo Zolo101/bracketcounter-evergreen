@@ -568,18 +568,22 @@
 
     const padStart = (t: number) => t.toString().padStart(2, "0");
 
-    const deadlineDate = $derived(new Date(buffer.status.deadline));
-    const deadline = $derived(new Date(deadlineDate.getTime() - currentDate.getTime()));
+    const remainingSeconds = $derived(
+        Math.max(0, Math.floor((buffer.status.deadline - currentDate.getTime()) / 1000))
+    );
+    const deadlineHours = $derived(Math.floor(remainingSeconds / 3600));
+    const deadlineMinutes = $derived(Math.floor((remainingSeconds % 3600) / 60));
+    const deadlineSeconds = $derived(remainingSeconds % 60);
 </script>
 
 {#snippet info()}
     <div class="py-5">
         <section class="text-center text-6xl max-xl:text-5xl max-lg:text-4xl max-sm:text-6xl">
-            <span>{padStart(deadline.getHours() - 1)}</span>
+            <span>{padStart(deadlineHours)}</span>
             <span>:</span>
-            <span>{padStart(deadline.getMinutes())}</span>
+            <span>{padStart(deadlineMinutes)}</span>
             <span>:</span>
-            <span>{padStart(deadline.getSeconds())}</span>
+            <span>{padStart(deadlineSeconds)}</span>
         </section>
         <section class="max-sm:hidden">
             <span

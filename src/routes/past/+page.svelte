@@ -12,14 +12,18 @@
     import BFDIE9Results from "$lib/assets/results/bfdie9.png";
     import BFDIETotalResults from "$lib/assets/results/bfdie_total.png";
 
+    import TPOT25Results from "$lib/assets/results/tpot25.png";
+
     let { data }: PageProps = $props();
 </script>
 
-<main class="flex flex-col gap-2 text-2xl text-white">
+<main class="m-auto flex flex-col gap-2 text-2xl text-white">
     <a href="/">GO BACK</a>
 
-    <p>all of these are unconfirmed past results</p>
-    <h1 class="text-3xl font-bold">BFDIE</h1>
+    <p>all of these are unconfirmed past results from the bracket counter.</p>
+    <h1>BFB</h1>
+    <p>Coming soon</p>
+    <h1>BFDIE</h1>
     <p>
         <a href={BFDIE1Results}>BFDIE1</a>, <a href={BFDIE2Results}>BFDIE2</a>,
         <a href={BFDIE3Results}>BFDIE3</a>,
@@ -28,4 +32,16 @@
         <a href={BFDIE8Results}>BFDIE8</a>, <a href={BFDIE9Results}>BFDIE9</a>,
         <a href={BFDIETotalResults}>TOTAL</a>
     </p>
+
+    <h1>TPOT</h1>
+    <p>Older episodes coming soon!</p>
+    <p><a href={TPOT25Results}>TPOT25</a></p>
 </main>
+
+<style>
+    h1 {
+        text-align: center;
+        font-weight: bold;
+        font-size: var(--text-3xl);
+    }
+</style>

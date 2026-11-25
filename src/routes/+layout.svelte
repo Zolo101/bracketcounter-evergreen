@@ -121,6 +121,7 @@
         height: 100dvh;
         object-fit: cover;
         object-position: center;
+        filter: grayscale(1);
     }
     .background2 {
         position: fixed;

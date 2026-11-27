@@ -629,7 +629,7 @@
                         <enhanced:img
                             src={image}
                             alt={contestant.name}
-                            class="contestant-icon size-24"
+                            class="contestant-icon h-24 w-24"
                             // class="contestant-icon h-24 w-24 max-sm:h-20 max-sm:w-20"
                             // sizes="96px"
                         />
@@ -667,10 +667,10 @@
     <!-- {/if} -->
 {/snippet}
 
-<!-- <div class="mobile-logo sm:hidden">
+<div class="mobile-logo sm:hidden">
     <BCLOGO_LONG />
-</div> -->
-<!-- <nav class="flex flex-col gap-2 text-white" bind:clientHeight={navHeight}>
+</div>
+<nav class="flex flex-col gap-2 text-white" bind:clientHeight={navHeight}>
     <section class="flex items-center justify-between gap-2 max-sm:flex-col">
         <div class="text-xs">
             <div
@@ -695,6 +695,7 @@
                         The contestant with the <strong class="font-black">least</strong>
                         votes will rejoin.
                     </p>
+                    <!-- (according to <em class="text-green-400">Two...</em>) -->
                     <p class="text-2xl font-bold text-blue-100">
                         *We cannot count the <a
                             target="_blank"
@@ -709,6 +710,16 @@
         </section>
     </section>
     <div class="mb-5 flex items-center justify-between gap-2 max-sm:flex-col-reverse">
+        <!-- <section class="w-50">
+            <div class="flex overflow-hidden rounded ring-2 ring-secondary">
+                <button class="toggle-btn" class:active={!sort} onclick={() => (sort = false)}>
+                    LEAST
+                </button>
+                <button class="toggle-btn" class:active={sort} onclick={() => (sort = true)}>
+                    MOST
+                </button>
+            </div>
+        </section> -->
         <section class="vote-summary">
             <div class="total-votes text-2xl font-bold max-lg:text-4xl">
                 <p>
@@ -724,6 +735,27 @@
                     </span>
                     <br />
                 {/if}
+                <!-- {#if countsReady}
+                    <div
+                        class={[
+                            "mx-1 inline-block h-2 w-2 animate-ping rounded-full",
+                            dataIsStale ? "bg-orange-500" : "bg-green-500"
+                        ]}
+                    ></div>
+                    <div
+                        class={[
+                            "relative right-4.75 mx-1 inline-block h-2 w-2 rounded-full",
+                            dataIsStale ? "bg-orange-500" : "bg-green-500"
+                        ]}
+                    ></div>
+                    <span class="relative right-4.75" aria-live="polite">
+                        {#if dataIsStale}
+                            Counts may be outdated... please refresh your browser! Updated {lastUpdated}
+                        {:else}
+                            Updated {lastUpdated}
+                        {/if}
+                    </span>
+                {/if} -->
             </div>
         </section>
         {#if showBroadcast}
@@ -739,32 +771,18 @@
             </div>
         {/if}
     </div>
-</nav> -->
+</nav>
 <!-- <main class="mb-10 w-full grow" style="max-height: calc(100vh - {navHeight}px - 150px);"> -->
-<main class="flex min-h-dvh w-full flex-col items-center justify-center gap-6 px-4">
-    <h1 class="w-full max-w-137">
-        <BCLOGO class="block h-auto w-full" role="img" aria-label="bracketcounter" />
-    </h1>
-    <a href="/past" class="text-2xl">Past results</a>
-    <div class="flex max-w-full items-center justify-center gap-2">
-        {#if showBroadcast}
-            <aside
-                class="broadcast min-w-0 rounded-r-[1.75rem] bg-blue-800 py-3 pr-7 pl-3 text-2xl font-bold wrap-break-word max-sm:text-lg"
-                role="status"
-                aria-live="polite"
-            >
-                {@html broadcastMessage}
-            </aside>
-        {/if}
-        <img src={announcer} alt="Announcer" class="h-32 shrink-0" />
-    </div>
-    <!-- <div class={["shabang", !countsReady && "invisible"]}>
+<main class="mb-10 w-full grow">
+    <div class={["shabang", !countsReady && "invisible"]}>
         {#each sortedContestants as contestant (contestant.id)}
+            <!-- <div animate:flip={{ easing: cubicOut }}> -->
             <div>
+                <!-- {@render bar(contestant)} -->
                 {@render cell(contestant)}
             </div>
         {/each}
-    </div> -->
+    </div>
 </main>
 
 <style>

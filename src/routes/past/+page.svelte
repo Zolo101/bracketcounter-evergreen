@@ -13,8 +13,6 @@
     import BFDIETotalResults from "$lib/assets/results/bfdie_total.png";
 
     import TPOT25Results from "$lib/assets/results/tpot25.png";
-
-    let { data }: PageProps = $props();
 </script>
 
 <main class="m-auto flex flex-col gap-2 text-2xl text-white">

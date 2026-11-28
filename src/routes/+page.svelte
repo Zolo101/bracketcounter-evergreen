@@ -623,7 +623,7 @@
                         <enhanced:img
                             src={image}
                             alt={contestant.name}
-                            class="contestant-icon size-24 scale-130"
+                            class="contestant-icon size-24 scale-170"
                             // class="contestant-icon h-24 w-24 max-sm:h-20 max-sm:w-20"
                             // sizes="96px"
                         />
@@ -637,7 +637,7 @@
                     {/if}
                     </div> -->
                 <!-- <span class="id absolute font-mono text-xs font-bold sm:top-3"> </span> -->
-                <div class="absolute right-5 bottom-6 max-lg:bottom-6">
+                <div class="absolute right-2 bottom-5.5 max-lg:bottom-5">
                     <!-- <span class="name text-xs font-bold wrap-anywhere text-shadow-sm">
                         {contestant.name}
                     </span> -->
@@ -798,14 +798,21 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(144px, 1fr));
         flex-direction: column;
-        gap: 1rem;
+        gap: 2rem 0;
     }
 
     @media (width < 540px) {
+        /* @media (height < 667px) {
+            .shabang {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 0rem 0;
+            }
+        } */
+
         .shabang {
-            grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             /* row gap leaves room for the scaled-up icons' pop-outs (scale-130 overflows ~14px) */
-            gap: 0.75rem 0;
+            gap: 2rem 0;
         }
     }
 

@@ -693,7 +693,7 @@
                     <p class="text-2xl font-bold text-blue-100">
                         *We cannot count the <a
                             target="_blank"
-                            href="https://forms.gle/m9VrLxqktU5KX7GW8">google form</a
+                            href="https://forms.gle/dN3poAkpY2g7pJG27">google form</a
                         > votes!!!
                     </p>
                 </div>

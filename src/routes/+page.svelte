@@ -592,7 +592,7 @@
         </section>
         <section class="flex items-center gap-2 italic max-sm:hidden">
             <span class="font-normal">View the counts live on <strong>bc.zelo.dev</strong></span>
-            <img src={QR} alt="QR Code for bc.zelo.dev" class="w-16 invert" />
+            <img src={QR} alt="QR Code for bc.zelo.dev" class="w-16" />
         </section>
         <!-- <p class="text-xs"></p> -->
     </div>
@@ -623,7 +623,7 @@
                         <enhanced:img
                             src={image}
                             alt={contestant.name}
-                            class="contestant-icon h-24 w-24"
+                            class="contestant-icon size-24 scale-130"
                             // class="contestant-icon h-24 w-24 max-sm:h-20 max-sm:w-20"
                             // sizes="96px"
                         />
@@ -670,13 +670,8 @@
             <div
                 class="flex items-center justify-center gap-2 text-lg max-lg:flex-col max-lg:pt-2 max-sm:gap-1 max-sm:text-sm lg:gap-10"
             >
-                <div class="flex items-center gap-10 max-sm:w-full max-sm:flex-col max-sm:gap-1">
-                    <div class="max-sm:hidden">
-                        <BCLOGO width={548 / 2} height={137 / 2} />
-                    </div>
-                    <div class="font-bold sm:hidden">
-                        {@render info()}
-                    </div>
+                <div class="flex items-center gap-10 max-sm:hidden">
+                    <BCLOGO width={548 / 2} height={137 / 2} />
                 </div>
                 <div>
                     <p>
@@ -690,12 +685,6 @@
                         votes will be eliminated.
                     </p>
                     <!-- (according to <em class="text-green-400">Two...</em>) -->
-                    <p class="text-2xl font-bold text-blue-100">
-                        *We cannot count the <a
-                            target="_blank"
-                            href="https://forms.gle/dN3poAkpY2g7pJG27">google form</a
-                        > votes!!!
-                    </p>
                 </div>
             </div>
         </div>
@@ -715,9 +704,16 @@
             </div>
         </section> -->
         <section class="vote-summary">
-            <div class="total-votes text-2xl font-bold max-lg:text-4xl">
-                <p>
-                    Total Votes: {countsReady ? `${buffer.total.toLocaleString()}*` : "Loading…"}
+            <div class="total-votes font-bold max-lg:text-center">
+                <p class="total-votes-count text-2xl max-lg:text-4xl">
+                    {countsReady ? `${buffer.total.toLocaleString()}` : "Loading…"} Votes*
+                </p>
+
+                <p class="text-sm font-bold text-blue-100 max-lg:text-base">
+                    *We cannot count the <a
+                        target="_blank"
+                        href="https://forms.gle/dN3poAkpY2g7pJG27">google form</a
+                    > votes!!!
                 </p>
             </div>
 
@@ -800,7 +796,7 @@
     /* the whole shabang */
     .shabang {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(144px, 1fr));
         flex-direction: column;
         gap: 1rem;
     }
@@ -808,7 +804,8 @@
     @media (width < 540px) {
         .shabang {
             grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-            gap: 0;
+            /* row gap leaves room for the scaled-up icons' pop-outs (scale-130 overflows ~14px) */
+            gap: 0.75rem 0;
         }
     }
 
@@ -833,7 +830,7 @@
             container-type: inline-size;
         }
 
-        .total-votes p {
+        .total-votes-count {
             font-size: 9.75cqi;
             line-height: 1.1;
             white-space: nowrap;
@@ -841,6 +838,7 @@
     }
 
     .broadcast {
+        /* TODO: Doesn't actually show in most browsers since this is very new... */
         corner-shape: superellipse(0);
     }
 

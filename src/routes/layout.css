@@ -16,7 +16,7 @@
         /* font-family: "Inter", sans-serif; */
         font-family: "DM Sans", sans-serif;
         font-optical-sizing: auto;
-        scrollbar-gutter: stable;
+        /* scrollbar-gutter: stable; */
         background-color: black;
     }
 

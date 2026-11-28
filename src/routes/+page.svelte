@@ -233,7 +233,8 @@
 
         const initialiseCounts = async () => {
             try {
-                const record = await bc.getOne("z9p5hpg808n7ovw");
+                // TODO: Make this record id a constant...
+                const record = await bc.getOne("7au82u6xmi9i72q");
                 if (!cancelled) {
                     handleMeta(record);
                     updateBuffer(record.buffer, false);
@@ -246,7 +247,7 @@
 
             if (cancelled) return;
 
-            unsubscribe = await bc.subscribe("z9p5hpg808n7ovw", (e) => {
+            unsubscribe = await bc.subscribe("7au82u6xmi9i72q", (e) => {
                 handleMeta(e.record);
                 updateBuffer(e.record.buffer);
                 countsReady = true;
@@ -589,18 +590,19 @@
             <span>{padStart(deadlineSeconds)}</span>
         </section> -->
         <section class="max-sm:hidden">
-            <!-- <span
-                ><abbr title="Count from the beginning to catch any vote changes / deletions"
-                    >RECOUNT</abbr
-                > NOW</span
-            > -->
-            <!-- <span>{buffer.config.longRefreshTime / 3600} HOURS</span> -->
+            <span
+                ><abbr
+                    title="Reset everything and count from the beginning to catch any vote edits / deletions"
+                    >RECOUNTS</abbr
+                > EVERY</span
+            >
+            <span>{buffer.config.longRefreshTime / 3600} HOURS</span>
         </section>
         <section class="flex items-center gap-2 italic max-sm:hidden">
-            <span class="font-normal">View the results on <strong>bc.zelo.dev</strong></span>
+            <span class="font-normal">View the counts live on <strong>bc.zelo.dev</strong></span>
             <img src={QR} alt="QR Code for bc.zelo.dev" class="w-16 invert" />
         </section>
-        <p class="text-xs"></p>
+        <!-- <p class="text-xs"></p> -->
     </div>
 {/snippet}
 
@@ -647,7 +649,7 @@
                     <!-- <span class="name text-xs font-bold wrap-anywhere text-shadow-sm">
                         {contestant.name}
                     </span> -->
-                    <span class="text-[9px] font-bold opacity-50">
+                    <span class="text-[11px] font-bold opacity-50">
                         {contestant.id.toUpperCase()}
                     </span>
                 </div>
@@ -686,14 +688,14 @@
                 </div>
                 <div>
                     <p>
-                        Unofficial vote counter for TPOT 25, based on <a
+                        Unofficial vote counter for TPOT 26, based on <a
                             target="_blank"
                             href="https://bfb.figgyc.uk/static/gate.html">figgyc's bracketcounter</a
-                        >. <a href="/past">BFDIE results</a>
+                        >. <a href="/past">Past results</a>
                     </p>
                     <p>
                         The contestant with the <strong class="font-black">least</strong>
-                        votes will rejoin.
+                        votes will be eliminated.
                     </p>
                     <!-- (according to <em class="text-green-400">Two...</em>) -->
                     <p class="text-2xl font-bold text-blue-100">
@@ -735,7 +737,7 @@
                     </span>
                     <br />
                 {/if}
-                <!-- {#if countsReady}
+                {#if countsReady}
                     <div
                         class={[
                             "mx-1 inline-block h-2 w-2 animate-ping rounded-full",
@@ -755,7 +757,7 @@
                             Updated {lastUpdated}
                         {/if}
                     </span>
-                {/if} -->
+                {/if}
             </div>
         </section>
         {#if showBroadcast}

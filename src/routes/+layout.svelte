@@ -128,7 +128,7 @@
         z-index: 1;
         pointer-events: none;
         /* background: linear-gradient(to bottom, #a6e0ec, black); */
-        background: linear-gradient(to bottom, transparent, black 80%);
+        background: linear-gradient(to bottom, transparent, #000000aa 80%);
     }
 
     .container2 {

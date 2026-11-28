@@ -59,7 +59,8 @@
 </script>
 
 <svelte:head>
-    <link rel="icon" href="/favicon.png" type="image/png" sizes="192x192" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="apple-touch-icon" href={appIcon} />
     <title>TPOT Vote Tracker - bracketcounter</title>
     <meta

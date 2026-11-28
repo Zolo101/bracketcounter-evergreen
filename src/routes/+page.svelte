@@ -725,7 +725,7 @@
                 {#if visitors !== null}
                     <span>
                         {visitors.toLocaleString()}
-                        {visitors === 1 ? "user" : "users"} watching on bc.zelo.dev
+                        {visitors === 1 ? "user" : "users"} watching on https://bc.zelo.dev
                     </span>
                     <br />
                 {/if}

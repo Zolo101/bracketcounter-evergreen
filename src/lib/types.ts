@@ -30,11 +30,6 @@ export type Status = {
     done: boolean;
 };
 
-/** Temp stuff i can add in */
-export type Meta = {
-    message: string;
-};
-
 export type SocketMessageData = {
     id: string;
     title: string;
@@ -47,6 +42,10 @@ export type SocketMessageData = {
         config: Config;
         votes: Votes;
         total: number;
-        meta?: Meta;
     };
+};
+
+/** Standalone announcement record; `buffer` holds the message (HTML allowed, empty = hidden). */
+export type AnnouncementRecord = Omit<SocketMessageData, "buffer"> & {
+    buffer: string | null;
 };

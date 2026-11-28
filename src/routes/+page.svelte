@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { SocketMessageData } from "$lib/types";
+    import type { AnnouncementRecord, SocketMessageData } from "$lib/types";
     import Pocketbase from "pocketbase";
     import BCLOGO from "$lib/assets/bracketcounter.svg?component";
     import BCLOGO_LONG from "$lib/assets/bracketcounter_long.svg?component";
@@ -42,7 +42,6 @@
     let currentAudio: HTMLAudioElement | undefined;
     let playingContestants = $state<Record<string, number>>({});
     let broadcastMessage = $state("");
-    let broadcastExpiresAt = $state(0);
     const activeExplosions = new Set<{
         layer: HTMLDivElement;
         target: HTMLElement;
@@ -54,8 +53,8 @@
         timeline: ReturnType<typeof gsap.timeline>;
     }>();
 
-    const BROADCAST_DURATION = 15 * 60 * 1000;
-    const BROADCAST_STORAGE_KEY = "bracketcounter-broadcast";
+    const COUNTS_RECORD_ID = "7au82u6xmi9i72q";
+    const ANNOUNCEMENT_RECORD_ID = "2nolnq03l7xinqo";
 
     function playContestantSound(name: string) {
         const sound = Sounds[`/src/lib/assets/sounds/${name}.ogg`]?.default;
@@ -84,6 +83,7 @@
 
     const client = new Pocketbase("https://cdn.zelo.dev");
     const bc = client.collection<SocketMessageData>("bracketcounter");
+    const announcements = client.collection<AnnouncementRecord>("bracketcounter");
 
     // const barTweens = new Map<string, { from: number; to: number }>();
 
@@ -141,9 +141,7 @@
         currentDate.getTime() - new Date(buffer.status.updateDate).getTime() > 120_000
         // currentDate.getTime() - new Date(buffer.status.updateDate).getTime() > 100
     );
-    const showBroadcast = $derived(
-        broadcastMessage.length > 0 && currentDate.getTime() < broadcastExpiresAt
-    );
+    const showBroadcast = $derived(broadcastMessage.length > 0);
     const lastUpdated = $derived(
         formatRelativeTimeLong(new Date(buffer.status.updateDate), currentDate)
     );
@@ -157,36 +155,10 @@
         let unsubscribe: (() => void) | undefined;
         let viewerCountRequest: AbortController | undefined;
 
-        try {
-            const storedBroadcast = JSON.parse(
-                sessionStorage.getItem(BROADCAST_STORAGE_KEY) ?? "null"
-            ) as { message?: unknown; expiresAt?: unknown } | null;
+        let unsubscribeAnnouncement: (() => void) | undefined;
 
-            if (
-                typeof storedBroadcast?.message === "string" &&
-                typeof storedBroadcast.expiresAt === "number" &&
-                storedBroadcast.expiresAt > Date.now()
-            ) {
-                broadcastMessage = storedBroadcast.message;
-                broadcastExpiresAt = storedBroadcast.expiresAt;
-            } else {
-                sessionStorage.removeItem(BROADCAST_STORAGE_KEY);
-            }
-        } catch {
-            sessionStorage.removeItem(BROADCAST_STORAGE_KEY);
-        }
-
-        const handleMeta = (record: SocketMessageData) => {
-            const message = record.buffer.meta?.message?.trim();
-
-            if (message) {
-                broadcastMessage = message;
-                broadcastExpiresAt = Date.now() + BROADCAST_DURATION;
-                sessionStorage.setItem(
-                    BROADCAST_STORAGE_KEY,
-                    JSON.stringify({ message: broadcastMessage, expiresAt: broadcastExpiresAt })
-                );
-            }
+        const handleAnnouncement = (record: AnnouncementRecord) => {
+            broadcastMessage = typeof record.buffer === "string" ? record.buffer.trim() : "";
         };
 
         const updateViewerCount = async () => {
@@ -233,10 +205,8 @@
 
         const initialiseCounts = async () => {
             try {
-                // TODO: Make this record id a constant...
-                const record = await bc.getOne("7au82u6xmi9i72q");
+                const record = await bc.getOne(COUNTS_RECORD_ID);
                 if (!cancelled) {
-                    handleMeta(record);
                     updateBuffer(record.buffer, false);
                     countsReady = true;
                 }
@@ -247,8 +217,7 @@
 
             if (cancelled) return;
 
-            unsubscribe = await bc.subscribe("7au82u6xmi9i72q", (e) => {
-                handleMeta(e.record);
+            unsubscribe = await bc.subscribe(COUNTS_RECORD_ID, (e) => {
                 updateBuffer(e.record.buffer);
                 countsReady = true;
             });
@@ -256,7 +225,29 @@
             if (cancelled) unsubscribe();
         };
 
+        const initialiseAnnouncement = async () => {
+            try {
+                const record = await announcements.getOne(ANNOUNCEMENT_RECORD_ID);
+                if (!cancelled) handleAnnouncement(record);
+            } catch (error) {
+                console.error("Failed to fetch the announcement", error);
+            }
+
+            if (cancelled) return;
+
+            unsubscribeAnnouncement = await announcements.subscribe(ANNOUNCEMENT_RECORD_ID, (e) => {
+                if (e.action === "delete") {
+                    broadcastMessage = "";
+                } else {
+                    handleAnnouncement(e.record);
+                }
+            });
+
+            if (cancelled) unsubscribeAnnouncement();
+        };
+
         void initialiseCounts();
+        void initialiseAnnouncement();
         void updateViewerCount();
         const viewerCountInterval = setInterval(() => void updateViewerCount(), 300_000);
 
@@ -266,6 +257,7 @@
             clearInterval(viewerCountInterval);
             viewerCountRequest?.abort();
             unsubscribe?.();
+            unsubscribeAnnouncement?.();
             currentAudio?.pause();
 
             for (const explosion of activeExplosions) {
